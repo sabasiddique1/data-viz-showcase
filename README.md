@@ -1,4 +1,4 @@
-# Analytics Insights Dashboard
+# Data Viz Showcase
 
 A comprehensive Python web application featuring interactive data analysis dashboards, medical records management, encryption tools, and insurance cost analysis. Built with Flask and Chart.js for real-time data visualization.
 
@@ -29,8 +29,8 @@ A comprehensive Python web application featuring interactive data analysis dashb
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/analytics-insights-dashboard.git
-cd analytics-insights-dashboard
+git clone https://github.com/yourusername/data-viz-showcase.git
+cd data-viz-showcase
 ```
 
 2. Install dependencies (if needed):
@@ -138,4 +138,3 @@ Created as a comprehensive portfolio project demonstrating data analysis and web
 ---
 
 **Note**: This project includes both a web application and standalone analysis scripts. The insurance analysis can be run independently or viewed through the web interface.
-

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Main entry point for the Python Mega Project
+Main entry point for the Data Viz Showcase
 Provides a menu-driven interface to access all modules
 """
 
@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 def show_menu():
     """Display the main menu"""
     print("\n" + "="*50)
-    print("Python Mega Project - Main Menu")
+    print("Data Viz Showcase - Main Menu")
     print("="*50)
     print("1. Hurricane Analysis")
     print("2. Medical System")
@@ -64,7 +64,7 @@ def run_cipher_tools():
 
 def main():
     """Main function"""
-    print("Welcome to Python Mega Project!")
+    print("Welcome to Data Viz Showcase!")
     
     while True:
         show_menu()
@@ -79,7 +79,7 @@ def main():
         elif choice == '4':
             run_cipher_tools()
         elif choice == '5':
-            print("\nThank you for using Python Mega Project. Goodbye!")
+            print("\nThank you for using Data Viz Showcase. Goodbye!")
             break
         else:
             print("\nInvalid choice. Please enter a number between 1 and 5.")
