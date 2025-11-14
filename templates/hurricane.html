@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Hurricane Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-hurricane"></i> Hurricane Analysis</h1>
+    <p>Comprehensive analysis of hurricane data including statistics, patterns, and insights</p>
+</div>
+
+{% if data.error %}
+<div class="error-box">
+    <p>{{ data.error }}</p>
+</div>
+{% else %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-hurricane"></i></div>
+        <h3>Total Hurricanes</h3>
+        <p class="stat-value">{{ data.summary.total_hurricanes }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+        <h3>Total Damage</h3>
+        <p class="stat-value">${{ data.summary.total_damage_billions }}B</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <h3>Total Fatalities</h3>
+        <p class="stat-value">{{ data.summary.total_fatalities }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-wind"></i></div>
+        <h3>Avg Wind Speed</h3>
+        <p class="stat-value">{{ data.summary.average_wind_speed }} mph</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>Avg Category</h3>
+        <p class="stat-value">{{ data.summary.average_category }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-exclamation-triangle"></i> Extreme Events</h2>
+    <div class="info-cards">
+        <div class="info-card">
+            <h3><i class="fas fa-wind"></i> Strongest Hurricane</h3>
+            <p><strong>Name:</strong> {{ data.extremes.strongest.name }}</p>
+            <p><strong>Wind Speed:</strong> {{ data.extremes.strongest.max_wind_speed }} mph</p>
+            <p><strong>Category:</strong> {{ data.extremes.strongest.category }}</p>
+            <p><strong>Year:</strong> {{ data.extremes.strongest.year }}</p>
+        </div>
+        <div class="info-card">
+            <h3><i class="fas fa-dollar-sign"></i> Most Damaging</h3>
+            <p><strong>Name:</strong> {{ data.extremes.most_damaging.name }}</p>
+            <p><strong>Damage:</strong> ${{ data.extremes.most_damaging.damage_cost_billions }}B</p>
+            <p><strong>Year:</strong> {{ data.extremes.most_damaging.year }}</p>
+        </div>
+        <div class="info-card">
+            <h3><i class="fas fa-heart-broken"></i> Deadliest</h3>
+            <p><strong>Name:</strong> {{ data.extremes.deadliest.name }}</p>
+            <p><strong>Fatalities:</strong> {{ data.extremes.deadliest.fatalities }}</p>
+            <p><strong>Year:</strong> {{ data.extremes.deadliest.year }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-pie"></i> Category Distribution</h2>
+    <div class="chart-container">
+        <canvas id="categoryChart"></canvas>
+    </div>
+    <div class="distribution">
+        {% for category, count in data.category_distribution.items() %}
+        <div class="dist-item">
+            <span class="dist-label">Category {{ category }}:</span>
+            <span class="dist-value">{{ count }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> Damage Over Time</h2>
+    <div class="chart-container">
+        <canvas id="damageChart"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Wind Speed Comparison</h2>
+    <div class="chart-container">
+        <canvas id="windSpeedChart"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-table"></i> All Hurricanes</h2>
+    <div class="filter-section">
+        <input type="text" id="searchInput" placeholder="Search by name, year, or area..." class="search-input">
+        <select id="categoryFilter" class="filter-select">
+            <option value="">All Categories</option>
+            {% for category in data.category_distribution.keys() %}
+            <option value="{{ category }}">Category {{ category }}</option>
+            {% endfor %}
+        </select>
+        <select id="yearFilter" class="filter-select">
+            <option value="">All Years</option>
+            {% for year in data.year_distribution.keys() %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Category</th>
+                    <th>Wind Speed (mph)</th>
+                    <th>Damage ($B)</th>
+                    <th>Fatalities</th>
+                    <th>Affected Areas</th>
+                </tr>
+            </thead>
+            <tbody id="hurricaneTableBody">
+                {% for hurricane in data.all_hurricanes %}
+                <tr data-name="{{ hurricane.name|lower }}" data-year="{{ hurricane.year }}" data-category="{{ hurricane.category }}" data-areas="{{ hurricane.affected_areas|join(' ')|lower }}">
+                    <td><strong>{{ hurricane.name }}</strong></td>
+                    <td>{{ hurricane.year }}</td>
+                    <td>{{ hurricane.category }}</td>
+                    <td>{{ hurricane.max_wind_speed }}</td>
+                    <td>${{ hurricane.damage_cost_billions }}</td>
+                    <td>{{ hurricane.fatalities }}</td>
+                    <td>{{ hurricane.affected_areas|join(', ') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Chart data from server
+    const categoryData = {{ data.category_distribution|tojson }};
+    const hurricanes = {{ data.all_hurricanes|tojson }};
+    
+    // Category Distribution Chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(categoryData).map(c => `Category ${c}`),
+            datasets: [{
+                data: Object.values(categoryData),
+                backgroundColor: [
+                    '#e74c3c',
+                    '#e67e22',
+                    '#f39c12',
+                    '#d35400',
+                    '#c0392b'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Hurricane Category Distribution'
+                }
+            }
+        }
+    });
+    
+    // Damage Over Time Chart
+    const damageCtx = document.getElementById('damageChart').getContext('2d');
+    const sortedHurricanes = [...hurricanes].sort((a, b) => a.year - b.year);
+    new Chart(damageCtx, {
+        type: 'line',
+        data: {
+            labels: sortedHurricanes.map(h => h.year),
+            datasets: [{
+                label: 'Damage (Billions $)',
+                data: sortedHurricanes.map(h => h.damage_cost_billions),
+                borderColor: '#e74c3c',
+                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true
+                },
+                title: {
+                    display: true,
+                    text: 'Hurricane Damage Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Damage (Billions $)'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Wind Speed Comparison Chart
+    const windCtx = document.getElementById('windSpeedChart').getContext('2d');
+    new Chart(windCtx, {
+        type: 'bar',
+        data: {
+            labels: hurricanes.map(h => h.name),
+            datasets: [{
+                label: 'Wind Speed (mph)',
+                data: hurricanes.map(h => h.max_wind_speed),
+                backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                borderColor: '#e74c3c',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Wind Speed by Hurricane'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Wind Speed (mph)'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Search and Filter Functionality
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const yearFilter = document.getElementById('yearFilter');
+    const tableBody = document.getElementById('hurricaneTableBody');
+    const rows = tableBody.querySelectorAll('tr');
+    
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategory = categoryFilter.value;
+        const selectedYear = yearFilter.value;
+        
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const year = row.getAttribute('data-year');
+            const category = row.getAttribute('data-category');
+            const areas = row.getAttribute('data-areas');
+            
+            const matchesSearch = !searchTerm || 
+                name.includes(searchTerm) || 
+                year.includes(searchTerm) || 
+                areas.includes(searchTerm);
+            const matchesCategory = !selectedCategory || category === selectedCategory;
+            const matchesYear = !selectedYear || year === selectedYear;
+            
+            if (matchesSearch && matchesCategory && matchesYear) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    searchInput.addEventListener('input', filterTable);
+    categoryFilter.addEventListener('change', filterTable);
+    yearFilter.addEventListener('change', filterTable);
+</script>
+{% endblock %}
+

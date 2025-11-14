@@ -1,0 +1,49 @@
+{
+  "hurricanes": [
+    {
+      "name": "Hurricane Katrina",
+      "year": 2005,
+      "category": 5,
+      "max_wind_speed": 175,
+      "affected_areas": ["Louisiana", "Mississippi", "Alabama"],
+      "damage_cost_billions": 125,
+      "fatalities": 1833
+    },
+    {
+      "name": "Hurricane Sandy",
+      "year": 2012,
+      "category": 3,
+      "max_wind_speed": 115,
+      "affected_areas": ["New York", "New Jersey", "Connecticut"],
+      "damage_cost_billions": 70,
+      "fatalities": 233
+    },
+    {
+      "name": "Hurricane Harvey",
+      "year": 2017,
+      "category": 4,
+      "max_wind_speed": 130,
+      "affected_areas": ["Texas", "Louisiana"],
+      "damage_cost_billions": 125,
+      "fatalities": 107
+    },
+    {
+      "name": "Hurricane Irma",
+      "year": 2017,
+      "category": 5,
+      "max_wind_speed": 185,
+      "affected_areas": ["Florida", "Georgia", "South Carolina"],
+      "damage_cost_billions": 50,
+      "fatalities": 134
+    },
+    {
+      "name": "Hurricane Maria",
+      "year": 2017,
+      "category": 5,
+      "max_wind_speed": 175,
+      "affected_areas": ["Puerto Rico", "Dominican Republic"],
+      "damage_cost_billions": 90,
+      "fatalities": 2977
+    }
+  ]
+}

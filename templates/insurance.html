@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block title %}Insurance Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-shield-alt"></i> Medical Insurance Cost Analysis</h1>
+    <p>Comprehensive analysis of medical insurance costs by demographics, lifestyle factors, and geographic regions</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <h3>Total Records</h3>
+        <p class="stat-value">{{ data.summary.total_records }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-birthday-cake"></i></div>
+        <h3>Average Age</h3>
+        <p class="stat-value">{{ data.summary.average_age }} years</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-weight"></i></div>
+        <h3>Average BMI</h3>
+        <p class="stat-value">{{ data.summary.average_bmi }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+        <h3>Average Charges</h3>
+        <p class="stat-value">${{ "{:,.2f}".format(data.summary.average_charges) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-child"></i></div>
+        <h3>Avg Children</h3>
+        <p class="stat-value">{{ data.summary.average_children }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-smoking-ban"></i> Smoker vs Non-Smoker Analysis</h2>
+    <div class="info-cards">
+        <div class="info-card highlight-card">
+            <h3><i class="fas fa-smoking"></i> Smokers</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(data.smoker_analysis.smoker.average) }}</p>
+            <p class="stat-label">{{ data.smoker_analysis.smoker.count }} records</p>
+        </div>
+        <div class="info-card highlight-card">
+            <h3><i class="fas fa-ban"></i> Non-Smokers</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(data.smoker_analysis.non_smoker.average) }}</p>
+            <p class="stat-label">{{ data.smoker_analysis.non_smoker.count }} records</p>
+        </div>
+        <div class="info-card highlight-card danger">
+            <h3><i class="fas fa-exclamation-triangle"></i> Difference</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(data.smoker_analysis.difference) }}</p>
+            <p class="stat-label">{{ data.smoker_analysis.percentage_increase }}% more</p>
+        </div>
+    </div>
+    <div class="chart-container">
+        <canvas id="smokerChart"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-map-marked-alt"></i> Regional Analysis</h2>
+    <div class="info-cards">
+        {% for region, stats in data.region_analysis.items() %}
+        <div class="info-card">
+            <h3><i class="fas fa-map-marker-alt"></i> {{ region.capitalize() }}</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(stats.average) }}</p>
+            <p class="stat-label">{{ stats.count }} records</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="chart-container">
+        <canvas id="regionChart"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-venus-mars"></i> Gender Analysis</h2>
+    <div class="info-cards">
+        <div class="info-card">
+            <h3><i class="fas fa-mars"></i> Male</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(data.sex_analysis.male.average) }}</p>
+            <p class="stat-label">{{ data.sex_analysis.male.count }} records</p>
+        </div>
+        <div class="info-card">
+            <h3><i class="fas fa-venus"></i> Female</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(data.sex_analysis.female.average) }}</p>
+            <p class="stat-label">{{ data.sex_analysis.female.count }} records</p>
+        </div>
+        <div class="info-card">
+            <h3><i class="fas fa-chart-line"></i> Difference</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(data.sex_analysis.difference) }}</p>
+            <p class="stat-label">{{ data.sex_analysis.percentage_increase }}% more (males)</p>
+        </div>
+    </div>
+    <div class="chart-container">
+        <canvas id="sexChart"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-weight"></i> BMI Category Analysis</h2>
+    <div class="info-cards">
+        {% for category, stats in data.bmi_analysis.items() %}
+        <div class="info-card">
+            <h3><i class="fas fa-chart-bar"></i> {{ category }}</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(stats.average) }}</p>
+            <p class="stat-label">{{ stats.count }} records</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="chart-container">
+        <canvas id="bmiChart"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-calendar-alt"></i> Age Group Analysis</h2>
+    <div class="info-cards">
+        {% for age_group, stats in data.age_group_analysis.items() %}
+        <div class="info-card">
+            <h3><i class="fas fa-clock"></i> {{ age_group }} years</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(stats.average) }}</p>
+            <p class="stat-label">{{ stats.count }} records</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="chart-container">
+        <canvas id="ageChart"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-baby"></i> Children Analysis</h2>
+    <div class="info-cards">
+        {% for num_children, stats in data.children_analysis.items() %}
+        <div class="info-card">
+            <h3><i class="fas fa-child"></i> {{ num_children }} {% if num_children == '1' %}Child{% else %}Children{% endif %}</h3>
+            <p class="stat-value-large">${{ "{:,.2f}".format(stats.average) }}</p>
+            <p class="stat-label">{{ stats.count }} records</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="chart-container">
+        <canvas id="childrenChart"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-lightbulb"></i> Key Insights</h2>
+    <div class="insights-box">
+        <div class="insight-item">
+            <i class="fas fa-fire"></i>
+            <div>
+                <h4>Smoking Impact</h4>
+                <p>Smokers pay <strong>{{ data.insights.smoking_impact }}% more</strong> on average than non-smokers. This is the single biggest factor affecting insurance costs.</p>
+            </div>
+        </div>
+        <div class="insight-item">
+            <i class="fas fa-map-marked-alt"></i>
+            <div>
+                <h4>Regional Differences</h4>
+                <p><strong>{{ data.insights.highest_region.name.capitalize() }}</strong> has the highest average costs at ${{ "{:,.2f}".format(data.insights.highest_region.average) }}, while <strong>{{ data.insights.lowest_region.name.capitalize() }}</strong> has the lowest at ${{ "{:,.2f}".format(data.insights.lowest_region.average) }}.</p>
+            </div>
+        </div>
+        <div class="insight-item">
+            <i class="fas fa-weight"></i>
+            <div>
+                <h4>BMI Impact</h4>
+                <p>Obese individuals pay <strong>{{ data.insights.bmi_impact }}% more</strong> than those with normal BMI, highlighting the importance of maintaining a healthy weight.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Smoker Chart
+    const smokerCtx = document.getElementById('smokerChart').getContext('2d');
+    new Chart(smokerCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Smokers', 'Non-Smokers'],
+            datasets: [{
+                label: 'Average Charges ($)',
+                data: [
+                    {{ data.smoker_analysis.smoker.average }},
+                    {{ data.smoker_analysis.non_smoker.average }}
+                ],
+                backgroundColor: ['#e74c3c', '#27ae60'],
+                borderColor: ['#c0392b', '#229954'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Average Charges: Smokers vs Non-Smokers'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Region Chart
+    const regionCtx = document.getElementById('regionChart').getContext('2d');
+    const regionData = {{ data.region_analysis|tojson }};
+    new Chart(regionCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(regionData).map(r => r.charAt(0).toUpperCase() + r.slice(1)),
+            datasets: [{
+                label: 'Average Charges ($)',
+                data: Object.values(regionData).map(s => s.average),
+                backgroundColor: ['#3498db', '#9b59b6', '#e67e22', '#1abc9c'],
+                borderColor: ['#2980b9', '#8e44ad', '#d35400', '#16a085'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Average Charges by Region'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Sex Chart
+    const sexCtx = document.getElementById('sexChart').getContext('2d');
+    new Chart(sexCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [
+                    {{ data.sex_analysis.male.average }},
+                    {{ data.sex_analysis.female.average }}
+                ],
+                backgroundColor: ['#3498db', '#e91e63'],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Average Charges by Gender'
+                }
+            }
+        }
+    });
+
+    // BMI Chart
+    const bmiCtx = document.getElementById('bmiChart').getContext('2d');
+    const bmiData = {{ data.bmi_analysis|tojson }};
+    new Chart(bmiCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(bmiData),
+            datasets: [{
+                label: 'Average Charges ($)',
+                data: Object.values(bmiData).map(s => s.average),
+                backgroundColor: ['#f39c12', '#27ae60', '#e67e22', '#e74c3c'],
+                borderColor: ['#d68910', '#229954', '#d35400', '#c0392b'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Average Charges by BMI Category'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Age Group Chart
+    const ageCtx = document.getElementById('ageChart').getContext('2d');
+    const ageData = {{ data.age_group_analysis|tojson }};
+    new Chart(ageCtx, {
+        type: 'line',
+        data: {
+            labels: Object.keys(ageData),
+            datasets: [{
+                label: 'Average Charges ($)',
+                data: Object.values(ageData).map(s => s.average),
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true
+                },
+                title: {
+                    display: true,
+                    text: 'Average Charges by Age Group'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Children Chart
+    const childrenCtx = document.getElementById('childrenChart').getContext('2d');
+    const childrenData = {{ data.children_analysis|tojson }};
+    new Chart(childrenCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(childrenData).map(c => c + ' ' + (c === '1' ? 'Child' : 'Children')),
+            datasets: [{
+                label: 'Average Charges ($)',
+                data: Object.values(childrenData).map(s => s.average),
+                backgroundColor: '#9b59b6',
+                borderColor: '#8e44ad',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Average Charges by Number of Children'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+<style>
+    .stat-value-large {
+        font-size: 2em;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 10px 0;
+    }
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 0.9em;
+    }
+    .highlight-card {
+        border-left: 4px solid #3498db;
+    }
+    .highlight-card.danger {
+        border-left-color: #e74c3c;
+    }
+    .insights-box {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    .insight-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .insight-item i {
+        font-size: 2em;
+        color: #3498db;
+        margin-right: 15px;
+        margin-top: 5px;
+    }
+    .insight-item h4 {
+        margin: 0 0 5px 0;
+        color: #2c3e50;
+    }
+    .insight-item p {
+        margin: 0;
+        color: #555;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+

@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Cipher Tools{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-lock"></i> Cipher Tools</h1>
+    <p>Encryption and decryption tools with examples</p>
+</div>
+
+{% if data.error %}
+<div class="error-box">
+    <p>{{ data.error }}</p>
+</div>
+{% else %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-key"></i></div>
+        <h3>Available Ciphers</h3>
+        <p class="stat-value">{{ data.summary.total_ciphers }}</p>
+    </div>
+</div>
+
+<div class="cipher-interactive">
+    <h2><i class="fas fa-keyboard"></i> Interactive Cipher Tool</h2>
+    <p>Encrypt or decrypt your own text using different cipher methods</p>
+    
+    <div class="cipher-input-group">
+        <label for="cipherText">Enter Text:</label>
+        <input type="text" id="cipherText" placeholder="Type your text here...">
+    </div>
+    
+    <div class="cipher-input-group">
+        <label for="cipherType">Select Cipher Type:</label>
+        <select id="cipherType">
+            <option value="caesar">Caesar Cipher</option>
+            <option value="reverse">Reverse Cipher</option>
+            <option value="atbash">Atbash Cipher</option>
+        </select>
+    </div>
+    
+    <div class="cipher-input-group" id="shiftGroup" style="display: block;">
+        <label for="cipherShift">Shift (for Caesar Cipher):</label>
+        <input type="number" id="cipherShift" value="3" min="1" max="25">
+    </div>
+    
+    <div class="cipher-buttons">
+        <button class="btn btn-primary" onclick="encryptText()">
+            <i class="fas fa-lock"></i> Encrypt
+        </button>
+        <button class="btn btn-primary" onclick="decryptText()">
+            <i class="fas fa-unlock"></i> Decrypt
+        </button>
+        <button class="btn" onclick="clearText()" style="background: #95a5a6;">
+            <i class="fas fa-eraser"></i> Clear
+        </button>
+    </div>
+    
+    <div class="cipher-result" id="cipherResult" style="display: none;">
+        <h4 id="resultTitle"></h4>
+        <code id="resultText"></code>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-info-circle"></i> Cipher Descriptions</h2>
+    <div class="cipher-descriptions">
+        {% for cipher, description in data.cipher_descriptions.items() %}
+        <div class="info-card">
+            <h3>{{ cipher }} Cipher</h3>
+            <p>{{ description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-code"></i> Caesar Cipher Example</h2>
+    <div class="cipher-example">
+        <div class="cipher-step">
+            <p><strong>Original Text:</strong> <code>{{ data.examples.caesar_cipher.original }}</code></p>
+            <p><strong>Shift:</strong> {{ data.examples.caesar_cipher.shift }} positions</p>
+            <p><strong>Encrypted:</strong> <code>{{ data.examples.caesar_cipher.encrypted }}</code></p>
+            <p><strong>Decrypted:</strong> <code>{{ data.examples.caesar_cipher.decrypted }}</code></p>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-exchange-alt"></i> Reverse Cipher Example</h2>
+    <div class="cipher-example">
+        <div class="cipher-step">
+            <p><strong>Original Text:</strong> <code>{{ data.examples.reverse_cipher.original }}</code></p>
+            <p><strong>Encrypted:</strong> <code>{{ data.examples.reverse_cipher.encrypted }}</code></p>
+            <p><strong>Decrypted:</strong> <code>{{ data.examples.reverse_cipher.decrypted }}</code></p>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-sync-alt"></i> Atbash Cipher Example</h2>
+    <div class="cipher-example">
+        <div class="cipher-step">
+            <p><strong>Original Text:</strong> <code>{{ data.examples.atbash_cipher.original }}</code></p>
+            <p><strong>Encrypted:</strong> <code>{{ data.examples.atbash_cipher.encrypted }}</code></p>
+            <p><strong>Decrypted:</strong> <code>{{ data.examples.atbash_cipher.decrypted }}</code></p>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Show/hide shift input based on cipher type
+    document.getElementById('cipherType').addEventListener('change', function() {
+        const shiftGroup = document.getElementById('shiftGroup');
+        if (this.value === 'caesar') {
+            shiftGroup.style.display = 'block';
+        } else {
+            shiftGroup.style.display = 'none';
+        }
+    });
+    
+    async function encryptText() {
+        const text = document.getElementById('cipherText').value;
+        const cipherType = document.getElementById('cipherType').value;
+        const shift = parseInt(document.getElementById('cipherShift').value) || 3;
+        
+        if (!text.trim()) {
+            alert('Please enter some text to encrypt');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/cipher/encrypt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    cipher_type: cipherType,
+                    shift: shift
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                document.getElementById('resultTitle').textContent = 'Encrypted Text:';
+                document.getElementById('resultText').textContent = data.encrypted;
+                document.getElementById('cipherResult').style.display = 'block';
+            }
+        } catch (error) {
+            alert('Error encrypting text: ' + error.message);
+        }
+    }
+    
+    async function decryptText() {
+        const text = document.getElementById('cipherText').value;
+        const cipherType = document.getElementById('cipherType').value;
+        const shift = parseInt(document.getElementById('cipherShift').value) || 3;
+        
+        if (!text.trim()) {
+            alert('Please enter some text to decrypt');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/cipher/decrypt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    cipher_type: cipherType,
+                    shift: shift
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                document.getElementById('resultTitle').textContent = 'Decrypted Text:';
+                document.getElementById('resultText').textContent = data.decrypted;
+                document.getElementById('cipherResult').style.display = 'block';
+            }
+        } catch (error) {
+            alert('Error decrypting text: ' + error.message);
+        }
+    }
+    
+    function clearText() {
+        document.getElementById('cipherText').value = '';
+        document.getElementById('cipherResult').style.display = 'none';
+        document.getElementById('cipherText').focus();
+    }
+    
+    // Allow Enter key to encrypt
+    document.getElementById('cipherText').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            encryptText();
+        }
+    });
+</script>
+{% endblock %}
+

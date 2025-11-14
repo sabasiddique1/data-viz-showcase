@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Python Mega Project{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to Python Mega Project</h1>
+    <p class="subtitle">Explore data analysis, medical records, and cipher tools with interactive visualizations</p>
+</div>
+
+<div class="modules-grid">
+    <div class="module-card">
+        <div class="card-icon icon-hurricane">
+            <i class="fas fa-hurricane"></i>
+        </div>
+        <h2>Hurricane Analysis</h2>
+        <p>Analyze hurricane data including wind speeds, categories, damage costs, and affected areas. Identify patterns and statistics with interactive graphs.</p>
+        <a href="/hurricane" class="btn btn-primary">
+            <i class="fas fa-chart-line"></i> View Analysis
+        </a>
+    </div>
+    
+    <div class="module-card">
+        <div class="card-icon icon-medical">
+            <i class="fas fa-hospital"></i>
+        </div>
+        <h2>Medical System</h2>
+        <p>Manage and analyze patient medical records, diagnoses, medications, and vital signs. Track patient statistics with interactive visualizations.</p>
+        <a href="/medical" class="btn btn-primary">
+            <i class="fas fa-user-md"></i> View Records
+        </a>
+    </div>
+    
+    <div class="module-card">
+        <div class="card-icon icon-cipher">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h2>Cipher Tools</h2>
+        <p>Encryption and decryption tools including Caesar cipher, Reverse cipher, and Atbash cipher. Interactive encryption/decryption with real-time results.</p>
+        <a href="/cipher" class="btn btn-primary">
+            <i class="fas fa-key"></i> View Tools
+        </a>
+    </div>
+    
+    <div class="module-card">
+        <div class="card-icon icon-insurance">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h2>Insurance Analysis</h2>
+        <p>Analyze medical insurance costs by demographics, lifestyle factors, and regions. Explore how smoking, BMI, age, and location affect insurance charges with interactive visualizations.</p>
+        <a href="/insurance" class="btn btn-primary">
+            <i class="fas fa-chart-line"></i> View Analysis
+        </a>
+    </div>
+</div>
+{% endblock %}
+

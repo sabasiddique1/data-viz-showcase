@@ -1,0 +1,56 @@
+{
+  "patients": [
+    {
+      "patient_id": "P001",
+      "name": "John Smith",
+      "age": 45,
+      "diagnosis": "Hypertension",
+      "medications": ["Lisinopril", "Aspirin"],
+      "last_visit": "2024-01-15",
+      "vital_signs": {
+        "blood_pressure": "140/90",
+        "heart_rate": 78,
+        "temperature": 98.6
+      }
+    },
+    {
+      "patient_id": "P002",
+      "name": "Sarah Johnson",
+      "age": 32,
+      "diagnosis": "Type 2 Diabetes",
+      "medications": ["Metformin", "Insulin"],
+      "last_visit": "2024-01-20",
+      "vital_signs": {
+        "blood_pressure": "125/80",
+        "heart_rate": 72,
+        "temperature": 98.4
+      }
+    },
+    {
+      "patient_id": "P003",
+      "name": "Michael Brown",
+      "age": 58,
+      "diagnosis": "Coronary Artery Disease",
+      "medications": ["Atorvastatin", "Clopidogrel", "Metoprolol"],
+      "last_visit": "2024-01-18",
+      "vital_signs": {
+        "blood_pressure": "130/85",
+        "heart_rate": 65,
+        "temperature": 98.7
+      }
+    },
+    {
+      "patient_id": "P004",
+      "name": "Emily Davis",
+      "age": 28,
+      "diagnosis": "Asthma",
+      "medications": ["Albuterol", "Fluticasone"],
+      "last_visit": "2024-01-22",
+      "vital_signs": {
+        "blood_pressure": "118/75",
+        "heart_rate": 80,
+        "temperature": 98.5
+      }
+    }
+  ]
+}
