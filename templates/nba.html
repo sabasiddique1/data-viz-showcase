@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}NBA Trends Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-basketball-ball"></i> NBA Trends Analysis</h1>
+    <p>Analyze NBA game statistics, team performance, and trends across seasons</p>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-trophy"></i> Team Performance 2010</h2>
+    <div class="stats-grid">
+        {% for team, stats in data.team_stats_2010.items() %}
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-basketball-ball"></i></div>
+            <h3>{{ team }}</h3>
+            <p class="stat-value">{{ stats.avg_points }} pts</p>
+            <p class="stat-label">{{ stats.wins }}-{{ stats.games - stats.wins }} ({{ stats.win_rate }}%)</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-trophy"></i> Team Performance 2014</h2>
+    <div class="stats-grid">
+        {% for team, stats in data.team_stats_2014.items() %}
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-basketball-ball"></i></div>
+            <h3>{{ team }}</h3>
+            <p class="stat-value">{{ stats.avg_points }} pts</p>
+            <p class="stat-label">{{ stats.wins }}-{{ stats.games - stats.wins }} ({{ stats.win_rate }}%)</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Knicks vs Nets Comparison</h2>
+    <div class="chart-container">
+        <canvas id="knicksNetsChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart compares the average points scored by the New York Knicks and Brooklyn Nets in 2010 and 2014. It shows how team performance changed over time.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> In 2010, the Knicks averaged <strong>{{ data.knicks_vs_nets['2010'].knicks_avg }}</strong> points vs the Nets' <strong>{{ data.knicks_vs_nets['2010'].nets_avg }}</strong> points (difference: {{ data.knicks_vs_nets['2010'].difference }}). In 2014, the gap changed to {{ data.knicks_vs_nets['2014'].difference }} points.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Team performance can vary significantly between seasons. Analyzing trends helps identify which teams are improving or declining over time.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> Points Distribution 2010</h2>
+    <div class="chart-container">
+        <canvas id="points2010Chart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This histogram compares the distribution of points scored by the Knicks and Nets in 2010. It shows the frequency of different point totals, helping identify scoring patterns.</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> Points Distribution 2014</h2>
+    <div class="chart-container">
+        <canvas id="points2014Chart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This histogram compares the distribution of points scored by the Knicks and Nets in 2014. Comparing with 2010 shows how scoring patterns evolved.</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-home"></i> Home Advantage Analysis</h2>
+    <div class="info-cards">
+        <div class="info-card">
+            <h3><i class="fas fa-home"></i> Home Win Rate (2010)</h3>
+            <p class="stat-value-large">{{ data.home_advantage['2010'].home_win_rate }}%</p>
+            <p class="stat-label">{{ data.home_advantage['2010'].home_wins }} wins out of {{ data.home_advantage['2010'].home_games }} home games</p>
+        </div>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Shows</h4>
+        <p>Home court advantage is a well-documented phenomenon in sports. Teams typically perform better when playing at home due to factors like crowd support, familiarity with the court, and reduced travel fatigue.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> In 2010, teams won <strong>{{ data.home_advantage['2010'].home_win_rate }}%</strong> of their home games, demonstrating the significant impact of home court advantage in NBA basketball.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const knicksNets = {{ data.knicks_vs_nets|tojson }};
+    const points2010 = {{ data.points_data|tojson }};
+    
+    // Knicks vs Nets Comparison
+    const knicksNetsCtx = document.getElementById('knicksNetsChart').getContext('2d');
+    const knicksNetsChart = new Chart(knicksNetsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['2010 Knicks', '2010 Nets', '2014 Knicks', '2014 Nets'],
+            datasets: [{
+                label: 'Average Points',
+                data: [
+                    knicksNets['2010'].knicks_avg,
+                    knicksNets['2010'].nets_avg,
+                    knicksNets['2014'].knicks_avg,
+                    knicksNets['2014'].nets_avg
+                ],
+                backgroundColor: [
+                    'rgba(0, 107, 182, 0.7)',
+                    'rgba(0, 0, 0, 0.7)',
+                    'rgba(0, 107, 182, 0.7)',
+                    'rgba(0, 0, 0, 0.7)'
+                ],
+                borderColor: [
+                    '#006bb6',
+                    '#000000',
+                    '#006bb6',
+                    '#000000'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Knicks vs Nets: Average Points Comparison'
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Average Points per Game'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Points Distribution 2010
+    const points2010Ctx = document.getElementById('points2010Chart').getContext('2d');
+    const points2010Chart = new Chart(points2010Ctx, {
+        type: 'bar',
+        data: {
+            labels: Array.from({length: points2010.knicks_2010.length}, (_, i) => 'Game ' + (i + 1)),
+            datasets: [
+                {
+                    label: 'Knicks',
+                    data: points2010.knicks_2010,
+                    backgroundColor: 'rgba(0, 107, 182, 0.5)',
+                    borderColor: '#006bb6',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Nets',
+                    data: points2010.nets_2010,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    borderColor: '#000000',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Points per Game: Knicks vs Nets (2010)'
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Points'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Points Distribution 2014
+    const points2014Ctx = document.getElementById('points2014Chart').getContext('2d');
+    const points2014Chart = new Chart(points2014Ctx, {
+        type: 'bar',
+        data: {
+            labels: Array.from({length: points2010.knicks_2014.length}, (_, i) => 'Game ' + (i + 1)),
+            datasets: [
+                {
+                    label: 'Knicks',
+                    data: points2010.knicks_2014,
+                    backgroundColor: 'rgba(0, 107, 182, 0.5)',
+                    borderColor: '#006bb6',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Nets',
+                    data: points2010.nets_2014,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    borderColor: '#000000',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Points per Game: Knicks vs Nets (2014)'
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Points'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

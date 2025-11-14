@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Funnel Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-funnel-dollar"></i> E-Commerce Funnel Analysis</h1>
+    <p>Analyze conversion rates from visits to purchases and identify optimization opportunities</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-eye"></i></div>
+        <h3>Total Visits</h3>
+        <p class="stat-value">{{ data.funnel_data.visits }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+        <h3>Add to Cart</h3>
+        <p class="stat-value">{{ data.funnel_data.cart }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-credit-card"></i></div>
+        <h3>Checkout</h3>
+        <p class="stat-value">{{ data.funnel_data.checkout }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+        <h3>Purchases</h3>
+        <p class="stat-value">{{ data.funnel_data.purchase }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+        <h3>Overall Conversion</h3>
+        <p class="stat-value">{{ data.conversion_rates.overall_conversion }}%</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Conversion Funnel</h2>
+    <div class="chart-container">
+        <canvas id="funnelChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart visualizes the e-commerce conversion funnel, showing how many users progress through each stage: Visits → Add to Cart → Checkout → Purchase. The decreasing bar heights show where users drop off.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The weakest step in the funnel is <strong>{{ data.weakest_step }}</strong> with a {{ data.drop_off_rates[data.weakest_step.lower().replace(' ', '_')] }}% drop-off rate. This is where you should focus optimization efforts.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding funnel drop-offs helps identify where to invest in improvements. Even small improvements at the weakest step can significantly increase overall conversion rates.
+        </div>
+        
+        <ul>
+            <li><strong>Conversion rates:</strong> Cart: {{ data.conversion_rates.cart_rate }}%, Checkout: {{ data.conversion_rates.checkout_rate }}%, Purchase: {{ data.conversion_rates.purchase_rate }}%</li>
+            <li><strong>Optimization strategy:</strong> Focus on the step with the highest drop-off rate first</li>
+            <li><strong>Time analysis:</strong> Average time to purchase is {{ data.average_times.to_purchase }} minutes</li>
+            <li><strong>Business impact:</strong> Improving the weakest step by even 5% can significantly increase revenue</li>
+        </ul>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> Conversion Rates</h2>
+    <div class="chart-container">
+        <canvas id="conversionChart"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const funnelSteps = {{ data.funnel_steps|tojson }};
+    
+    const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+    const funnelChart = new Chart(funnelCtx, {
+        type: 'bar',
+        data: {
+            labels: funnelSteps.map(s => s.name),
+            datasets: [{
+                label: 'Number of Users',
+                data: funnelSteps.map(s => s.count),
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.7)',
+                    'rgba(52, 152, 219, 0.7)',
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(231, 76, 60, 0.7)'
+                ],
+                borderColor: [
+                    '#667eea',
+                    '#3498db',
+                    '#2ecc71',
+                    '#e74c3c'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'E-Commerce Conversion Funnel'
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Users'
+                    }
+                }
+            }
+        }
+    });
+    
+    const conversionCtx = document.getElementById('conversionChart').getContext('2d');
+    const conversionChart = new Chart(conversionCtx, {
+        type: 'line',
+        data: {
+            labels: ['Visits to Cart', 'Cart to Checkout', 'Checkout to Purchase'],
+            datasets: [{
+                label: 'Conversion Rate (%)',
+                data: [
+                    {{ data.conversion_rates.cart_rate }},
+                    {{ data.conversion_rates.checkout_rate }},
+                    {{ data.conversion_rates.purchase_rate }}
+                ],
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Conversion Rates by Stage'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Conversion Rate (%)'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

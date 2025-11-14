@@ -8,6 +8,10 @@ import hurricane_analysis
 import medical_system
 import cipher_tools
 import insurance_web
+import linear_regression
+import funnel_analysis
+import student_analysis
+import nba_analysis
 
 app = Flask(__name__)
 
@@ -140,6 +144,62 @@ def api_insurance_raw():
         return jsonify(records)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+@app.route('/regression')
+def regression():
+    """Linear regression analysis page"""
+    try:
+        results = linear_regression.analyze_linear_regression()
+        return render_template('regression.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/funnel')
+def funnel():
+    """Funnel analysis page"""
+    try:
+        results = funnel_analysis.analyze_funnel()
+        return render_template('funnel.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/students')
+def students():
+    """Student analysis page"""
+    try:
+        results = student_analysis.analyze_students()
+        return render_template('students.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/nba')
+def nba():
+    """NBA trends analysis page"""
+    try:
+        results = nba_analysis.analyze_nba()
+        return render_template('nba.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/api/regression')
+def api_regression():
+    """API endpoint for regression data"""
+    return jsonify(linear_regression.analyze_linear_regression())
+
+@app.route('/api/funnel')
+def api_funnel():
+    """API endpoint for funnel data"""
+    return jsonify(funnel_analysis.analyze_funnel())
+
+@app.route('/api/students')
+def api_students():
+    """API endpoint for student data"""
+    return jsonify(student_analysis.analyze_students())
+
+@app.route('/api/nba')
+def api_nba():
+    """API endpoint for NBA data"""
+    return jsonify(nba_analysis.analyze_nba())
 
 if __name__ == '__main__':
     print("\n" + "="*60)

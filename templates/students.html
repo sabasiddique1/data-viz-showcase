@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Student Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-graduation-cap"></i> Student Performance Analysis</h1>
+    <p>Statistical analysis of student grades, demographics, and performance patterns</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <h3>Total Students</h3>
+        <p class="stat-value">{{ data.summary.total_students }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-calculator"></i></div>
+        <h3>Mean Grade</h3>
+        <p class="stat-value">{{ data.summary.mean_grade }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-sort-numeric-down"></i></div>
+        <h3>Median Grade</h3>
+        <p class="stat-value">{{ data.summary.median_grade }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>Mode Grade</h3>
+        <p class="stat-value">{{ data.summary.mode_grade }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-ruler"></i></div>
+        <h3>Grade Range</h3>
+        <p class="stat-value">{{ data.summary.grade_range }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        <h3>Std Deviation</h3>
+        <p class="stat-value">{{ data.summary.std_grade }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Grade Distribution</h2>
+    <div class="chart-container">
+        <canvas id="gradeHistogram"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This histogram displays the distribution of math grades across all students. It shows how many students scored in each grade range, helping identify patterns in performance.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The mean grade is <strong>{{ data.summary.mean_grade }}</strong> with a standard deviation of <strong>{{ data.summary.std_grade }}</strong>. The distribution shows how grades are spread around the average.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding grade distribution helps educators identify if students are struggling, excelling, or if there are any unusual patterns that need attention.
+        </div>
+        
+        <ul>
+            <li><strong>Mean:</strong> Average of all grades ({{ data.summary.mean_grade }})</li>
+            <li><strong>Median:</strong> Middle value when grades are sorted ({{ data.summary.median_grade }})</li>
+            <li><strong>Mode:</strong> Most frequently occurring grade ({{ data.summary.mode_grade }})</li>
+            <li><strong>Standard Deviation:</strong> Measures spread - higher values mean more variation in grades</li>
+        </ul>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-pie"></i> Mothers' Job Distribution</h2>
+    <div class="chart-container">
+        <canvas id="mjobChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This pie chart shows the distribution of students' mothers' occupations. Understanding demographic factors can help identify correlations with academic performance.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The chart reveals the most common occupations among students' mothers, which can be useful for understanding socioeconomic factors that may influence education.
+        </div>
+    </div>
+    <div class="distribution" style="margin-top: 2rem;">
+        {% for job, count in data.mjob_distribution.items() %}
+        <div class="dist-item">
+            <span class="dist-label">{{ job|title }}:</span>
+            <span class="dist-value">{{ count }} students</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Fathers' Job Distribution</h2>
+    <div class="chart-container">
+        <canvas id="fjobChart"></canvas>
+    </div>
+    <div class="distribution" style="margin-top: 2rem;">
+        {% for job, count in data.fjob_distribution.items() %}
+        <div class="dist-item">
+            <span class="dist-label">{{ job|title }}:</span>
+            <span class="dist-value">{{ count }} students</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-map-marker-alt"></i> Address Distribution</h2>
+    <div class="chart-container">
+        <canvas id="addressChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart compares the number of students from urban (U) vs rural (R) areas. Location can be an important factor in educational outcomes and resource availability.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const gradeDistribution = {{ data.grade_distribution|tojson }};
+    const mjobDistribution = {{ data.mjob_distribution|tojson }};
+    const fjobDistribution = {{ data.fjob_distribution|tojson }};
+    const addressDistribution = {{ data.address_distribution|tojson }};
+    
+    // Grade Histogram
+    const gradeCtx = document.getElementById('gradeHistogram').getContext('2d');
+    const gradeChart = new Chart(gradeCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(gradeDistribution).map(k => k + '-' + (parseInt(k) + 1)),
+            datasets: [{
+                label: 'Number of Students',
+                data: Object.values(gradeDistribution),
+                backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                borderColor: '#667eea',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Math Grade Distribution'
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Students'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Grade Range'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Mothers' Job Chart
+    const mjobCtx = document.getElementById('mjobChart').getContext('2d');
+    const mjobChart = new Chart(mjobCtx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(mjobDistribution).map(j => j.charAt(0).toUpperCase() + j.slice(1)),
+            datasets: [{
+                data: Object.values(mjobDistribution),
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.7)',
+                    'rgba(52, 152, 219, 0.7)',
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(231, 76, 60, 0.7)',
+                    'rgba(155, 89, 182, 0.7)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: "Distribution of Mothers' Jobs"
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    // Fathers' Job Chart
+    const fjobCtx = document.getElementById('fjobChart').getContext('2d');
+    const fjobChart = new Chart(fjobCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(fjobDistribution).map(j => j.charAt(0).toUpperCase() + j.slice(1)),
+            datasets: [{
+                label: 'Number of Students',
+                data: Object.values(fjobDistribution),
+                backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                borderColor: '#2ecc71',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: "Distribution of Fathers' Jobs"
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Students'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Address Chart
+    const addressCtx = document.getElementById('addressChart').getContext('2d');
+    const addressChart = new Chart(addressCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(addressDistribution).map(a => a === 'U' ? 'Urban' : 'Rural'),
+            datasets: [{
+                data: Object.values(addressDistribution),
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.7)',
+                    'rgba(46, 204, 113, 0.7)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Urban vs Rural Distribution'
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

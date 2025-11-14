@@ -10,27 +10,133 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <h1 class="nav-title">Data Viz Showcase</h1>
-            <div class="nav-links">
-                <a href="/"><i class="fas fa-home"></i> Home</a>
-                <a href="/hurricane"><i class="fas fa-hurricane"></i> Hurricanes</a>
-                <a href="/medical"><i class="fas fa-hospital"></i> Medical</a>
-                <a href="/cipher"><i class="fas fa-lock"></i> Cipher</a>
-                <a href="/insurance"><i class="fas fa-shield-alt"></i> Insurance</a>
-            </div>
-        </div>
-    </nav>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
     
-    <main class="container">
-        {% block content %}{% endblock %}
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">
+                <i class="fas fa-chart-bar"></i>
+                <span>Data Viz Showcase</span>
+            </h1>
+            <button class="sidebar-close" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/hurricane" class="nav-item">
+                <i class="fas fa-hurricane"></i>
+                <span>Hurricanes</span>
+            </a>
+            <a href="/medical" class="nav-item">
+                <i class="fas fa-hospital"></i>
+                <span>Medical</span>
+            </a>
+            <a href="/cipher" class="nav-item">
+                <i class="fas fa-lock"></i>
+                <span>Cipher</span>
+            </a>
+            <a href="/insurance" class="nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Insurance</span>
+            </a>
+            <a href="/regression" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Regression</span>
+            </a>
+            <a href="/funnel" class="nav-item">
+                <i class="fas fa-funnel-dollar"></i>
+                <span>Funnel</span>
+            </a>
+            <a href="/students" class="nav-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Students</span>
+            </a>
+            <a href="/nba" class="nav-item">
+                <i class="fas fa-basketball-ball"></i>
+                <span>NBA</span>
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
     </main>
     
     <footer class="footer">
         <p>&copy; 2024 Data Viz Showcase - Data Analysis & Tools</p>
     </footer>
     {% block extra_scripts %}{% endblock %}
+    <script>
+        // Sidebar toggle functionality
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        function updateMenuToggleVisibility() {
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains('open')) {
+                    menuToggle.style.display = 'none';
+                } else {
+                    menuToggle.style.display = 'block';
+                }
+            }
+        }
+        
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            updateMenuToggleVisibility();
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            updateMenuToggleVisibility();
+        }
+        
+        menuToggle.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+        
+        // Set active nav item based on current URL
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-item').forEach(item => {
+            if (item.getAttribute('href') === currentPath || 
+                (currentPath === '/' && item.getAttribute('href') === '/') ||
+                (currentPath !== '/' && item.getAttribute('href') !== '/' && currentPath.startsWith(item.getAttribute('href')))) {
+                item.classList.add('active');
+            }
+        });
+        
+        // Close sidebar when clicking a nav item on mobile
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    setTimeout(closeSidebar, 100);
+                });
+            });
+        }
+        
+        // Update on window resize
+        window.addEventListener('resize', updateMenuToggleVisibility);
+        updateMenuToggleVisibility();
+    </script>
 </body>
 </html>
 
