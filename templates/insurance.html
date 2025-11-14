@@ -6,6 +6,39 @@
 <div class="page-header">
     <h1><i class="fas fa-shield-alt"></i> Medical Insurance Cost Analysis</h1>
     <p>Comprehensive analysis of medical insurance costs by demographics, lifestyle factors, and geographic regions</p>
+    <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+        <i class="fas fa-database"></i> Data Source: <a href="https://www.kaggle.com" target="_blank" style="color: #667eea; text-decoration: none;">Kaggle</a> - Medical Insurance Dataset
+    </p>
+</div>
+
+<!-- Educational Guide Section -->
+<div class="section" style="background: linear-gradient(135deg, #e8f4f8 0%, #ffffff 100%); border-left: 5px solid #3498db;">
+    <h2><i class="fas fa-graduation-cap"></i> How to Use This Interactive Dashboard</h2>
+    <div class="chart-description">
+        <h4><i class="fas fa-lightbulb"></i> Getting the Most Value from This Analysis</h4>
+        <p>This dashboard is designed to help you understand what factors influence medical insurance costs and how you can make informed decisions about your health and finances.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+            <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h4 style="color: #667eea; margin-bottom: 0.75rem;"><i class="fas fa-sliders-h"></i> Use Interactive Filters</h4>
+                <p style="color: #555; line-height: 1.6;">Adjust the sliders and dropdowns above to filter data in real-time. See how different factors (age, BMI, smoking status, etc.) affect insurance costs. All charts update automatically!</p>
+            </div>
+            
+            <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h4 style="color: #667eea; margin-bottom: 0.75rem;"><i class="fas fa-chart-line"></i> Read Chart Descriptions</h4>
+                <p style="color: #555; line-height: 1.6;">Each chart includes detailed explanations below it. Read the "What This Chart Shows" sections to understand what the data represents and why it matters.</p>
+            </div>
+            
+            <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h4 style="color: #667eea; margin-bottom: 0.75rem;"><i class="fas fa-lightbulb"></i> Look for Insights</h4>
+                <p style="color: #555; line-height: 1.6;">Each chart includes "Key Insights" and "Takeaways" boxes highlighting the most important findings. Use these to make informed decisions about your health and finances.</p>
+            </div>
+        </div>
+        
+        <div class="key-takeaway" style="margin-top: 1.5rem;">
+            <strong>💡 Pro Tip:</strong> Start by exploring the interactive filters to see how different combinations of factors affect costs. Then read the chart descriptions to understand the deeper insights. This will help you identify actionable steps to potentially reduce your insurance costs.
+        </div>
+    </div>
 </div>
 
 <div class="stats-grid">
@@ -36,6 +69,83 @@
     </div>
 </div>
 
+<!-- Interactive Filter Panel -->
+<div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <h2 style="color: white;"><i class="fas fa-sliders-h"></i> Interactive Filters - Explore Data in Real-Time</h2>
+    <div class="interactive-filters">
+        <div class="filter-group">
+            <label><i class="fas fa-filter"></i> Age Range:</label>
+            <div class="range-container">
+                <input type="range" id="ageMin" min="18" max="64" value="18" class="range-slider">
+                <input type="range" id="ageMax" min="18" max="64" value="64" class="range-slider">
+                <div class="range-values">
+                    <span id="ageMinValue">18</span> - <span id="ageMaxValue">64</span> years
+                </div>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-weight"></i> BMI Range:</label>
+            <div class="range-container">
+                <input type="range" id="bmiMin" min="15" max="53" value="15" class="range-slider">
+                <input type="range" id="bmiMax" min="15" max="53" value="53" class="range-slider">
+                <div class="range-values">
+                    <span id="bmiMinValue">15</span> - <span id="bmiMaxValue">53</span>
+                </div>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-dollar-sign"></i> Charges Range:</label>
+            <div class="range-container">
+                <input type="range" id="chargesMin" min="1000" max="65000" value="1000" step="1000" class="range-slider">
+                <input type="range" id="chargesMax" min="1000" max="65000" value="65000" step="1000" class="range-slider">
+                <div class="range-values">
+                    $<span id="chargesMinValue">1,000</span> - $<span id="chargesMaxValue">65,000</span>
+                </div>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-smoking"></i> Smoker Status:</label>
+            <select id="smokerFilter" class="filter-select">
+                <option value="">All</option>
+                <option value="yes">Smokers</option>
+                <option value="no">Non-Smokers</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-venus-mars"></i> Gender:</label>
+            <select id="sexFilter" class="filter-select">
+                <option value="">All</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-map-marker-alt"></i> Region:</label>
+            <select id="regionFilter" class="filter-select">
+                <option value="">All Regions</option>
+                {% for region in data.region_analysis.keys() %}
+                <option value="{{ region }}">{{ region|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-child"></i> Children:</label>
+            <select id="childrenFilter" class="filter-select">
+                <option value="">All</option>
+                <option value="0">0 Children</option>
+                <option value="1">1 Child</option>
+                <option value="2">2 Children</option>
+                <option value="3">3 Children</option>
+                <option value="4">4+ Children</option>
+            </select>
+        </div>
+        <button id="resetFilters" class="btn-reset"><i class="fas fa-redo"></i> Reset Filters</button>
+        <div class="filter-stats">
+            <span id="filteredCount">{{ data.summary.total_records }}</span> of {{ data.summary.total_records }} records shown
+        </div>
+    </div>
+</div>
+
 <div class="section">
     <h2><i class="fas fa-smoking-ban"></i> Smoker vs Non-Smoker Analysis</h2>
     <div class="info-cards">
@@ -58,6 +168,24 @@
     <div class="chart-container">
         <canvas id="smokerChart"></canvas>
     </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart compares the average medical insurance charges between smokers and non-smokers. The visualization clearly demonstrates the significant financial impact of smoking on healthcare costs.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Smokers pay approximately <strong>{{ data.smoker_analysis.percentage_increase }}% more</strong> than non-smokers on average. This represents a difference of <strong>${{ "{:,.2f}".format(data.smoker_analysis.difference) }}</strong> per person annually.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Smoking is the single most expensive lifestyle factor affecting insurance costs. Quitting smoking could potentially save thousands of dollars annually in insurance premiums.
+        </div>
+        
+        <ul>
+            <li><strong>Why this matters:</strong> Insurance companies charge higher premiums for smokers due to increased health risks and medical costs</li>
+            <li><strong>What you can do:</strong> If you're a smoker, consider smoking cessation programs - many insurance plans offer support</li>
+            <li><strong>Data context:</strong> Based on {{ data.smoker_analysis.smoker.count }} smoker records and {{ data.smoker_analysis.non_smoker.count }} non-smoker records</li>
+        </ul>
+    </div>
 </div>
 
 <div class="section">
@@ -73,6 +201,24 @@
     </div>
     <div class="chart-container">
         <canvas id="regionChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart displays the average insurance charges across different geographic regions in the United States. Regional variations can be influenced by cost of living, healthcare infrastructure, and local health trends.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The <strong>{{ data.insights.highest_region.name.capitalize() }}</strong> region has the highest average costs at ${{ "{:,.2f}".format(data.insights.highest_region.average) }}, while the <strong>{{ data.insights.lowest_region.name.capitalize() }}</strong> has the lowest at ${{ "{:,.2f}".format(data.insights.lowest_region.average) }}.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Geographic location significantly impacts insurance costs. If you're planning to relocate, consider how regional healthcare costs might affect your insurance premiums.
+        </div>
+        
+        <ul>
+            <li><strong>Why regions differ:</strong> Factors include cost of living, state regulations, healthcare provider density, and population health</li>
+            <li><strong>What this means:</strong> The same person might pay different premiums depending on where they live</li>
+            <li><strong>Consideration:</strong> When comparing insurance plans, factor in regional cost differences</li>
+        </ul>
     </div>
 </div>
 
@@ -98,6 +244,24 @@
     <div class="chart-container">
         <canvas id="sexChart"></canvas>
     </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This doughnut chart compares average insurance charges between males and females. The visualization helps identify if gender plays a role in insurance pricing.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> {% if data.sex_analysis.difference > 0 %}Males pay ${{ "{:,.2f}".format(data.sex_analysis.difference) }} more{% else %}Females pay ${{ "{:,.2f}".format(-data.sex_analysis.difference) }} more{% endif %} on average than {% if data.sex_analysis.difference > 0 %}females{% else %}males{% endif %}. This represents a {{ data.sex_analysis.percentage }}% difference.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Gender-based pricing differences exist in insurance, though the gap is smaller than lifestyle factors like smoking. Understanding these differences helps in financial planning.
+        </div>
+        
+        <ul>
+            <li><strong>Why this matters:</strong> Gender can influence insurance costs due to different health risks and medical needs</li>
+            <li><strong>Data context:</strong> Based on {{ data.sex_analysis.male.count }} male records and {{ data.sex_analysis.female.count }} female records</li>
+            <li><strong>Note:</strong> Some jurisdictions have regulations limiting gender-based pricing differences</li>
+        </ul>
+    </div>
 </div>
 
 <div class="section">
@@ -113,6 +277,25 @@
     </div>
     <div class="chart-container">
         <canvas id="bmiChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart displays average insurance charges across different BMI (Body Mass Index) categories: Underweight, Normal, Overweight, and Obese. BMI is calculated as weight in kilograms divided by height in meters squared.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Obese individuals pay approximately <strong>{{ data.insights.bmi_impact }}% more</strong> than those with normal BMI. This highlights the financial impact of maintaining a healthy weight.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Maintaining a healthy BMI (18.5-24.9) can significantly reduce insurance costs. Weight management isn't just about health—it's also a financial investment.
+        </div>
+        
+        <ul>
+            <li><strong>BMI Categories:</strong> Underweight (&lt;18.5), Normal (18.5-24.9), Overweight (25-29.9), Obese (≥30)</li>
+            <li><strong>Why this matters:</strong> Higher BMI is associated with increased health risks, leading to higher medical costs</li>
+            <li><strong>What you can do:</strong> Many insurance plans offer wellness programs and discounts for maintaining healthy weight</li>
+            <li><strong>Health benefit:</strong> Beyond cost savings, maintaining a healthy weight reduces risk of chronic diseases</li>
+        </ul>
     </div>
 </div>
 
@@ -130,6 +313,25 @@
     <div class="chart-container">
         <canvas id="ageChart"></canvas>
     </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This line chart shows how average insurance charges change across different age groups. The trend line helps visualize the relationship between age and healthcare costs.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Insurance charges generally increase with age, reflecting the natural progression of healthcare needs as people get older. Older age groups typically require more medical care and preventive services.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Plan ahead for increasing healthcare costs as you age. Consider long-term health savings accounts (HSAs) or retirement health planning to prepare for higher insurance costs in later years.
+        </div>
+        
+        <ul>
+            <li><strong>Why age matters:</strong> Older individuals typically have more health conditions and require more frequent medical care</li>
+            <li><strong>Planning tip:</strong> Factor in age-related cost increases when planning for retirement healthcare expenses</li>
+            <li><strong>Preventive care:</strong> Investing in preventive care at younger ages can help reduce future healthcare costs</li>
+            <li><strong>Data pattern:</strong> The line chart shows the trend - you can see if costs increase linearly or if there are specific age thresholds where costs jump</li>
+        </ul>
+    </div>
 </div>
 
 <div class="section">
@@ -145,6 +347,25 @@
     </div>
     <div class="chart-container">
         <canvas id="childrenChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart compares average insurance charges based on the number of children covered under the insurance plan. This helps understand how family size affects insurance costs.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The number of children can impact insurance costs, though the relationship may not be linear. Some plans offer family discounts, while others charge per person.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> When choosing insurance plans, compare family vs. individual rates. Some plans offer better value for families with multiple children.
+        </div>
+        
+        <ul>
+            <li><strong>Why this varies:</strong> More children mean more potential medical visits, but some plans offer family discounts</li>
+            <li><strong>Planning consideration:</strong> Factor in family size when budgeting for healthcare costs</li>
+            <li><strong>Plan comparison:</strong> Compare how different insurance plans handle family coverage - some charge per person, others offer flat family rates</li>
+            <li><strong>Data note:</strong> The chart shows average costs, but individual plans may structure family pricing differently</li>
+        </ul>
     </div>
 </div>
 
@@ -180,7 +401,7 @@
 <script>
     // Smoker Chart
     const smokerCtx = document.getElementById('smokerChart').getContext('2d');
-    new Chart(smokerCtx, {
+    const smokerChart = new Chart(smokerCtx, {
         type: 'bar',
         data: {
             labels: ['Smokers', 'Non-Smokers'],
@@ -223,7 +444,7 @@
     // Region Chart
     const regionCtx = document.getElementById('regionChart').getContext('2d');
     const regionData = {{ data.region_analysis|tojson }};
-    new Chart(regionCtx, {
+    const regionChart = new Chart(regionCtx, {
         type: 'bar',
         data: {
             labels: Object.keys(regionData).map(r => r.charAt(0).toUpperCase() + r.slice(1)),
@@ -262,7 +483,7 @@
 
     // Sex Chart
     const sexCtx = document.getElementById('sexChart').getContext('2d');
-    new Chart(sexCtx, {
+    const sexChart = new Chart(sexCtx, {
         type: 'doughnut',
         data: {
             labels: ['Male', 'Female'],
@@ -294,7 +515,7 @@
     // BMI Chart
     const bmiCtx = document.getElementById('bmiChart').getContext('2d');
     const bmiData = {{ data.bmi_analysis|tojson }};
-    new Chart(bmiCtx, {
+    const bmiChart = new Chart(bmiCtx, {
         type: 'bar',
         data: {
             labels: Object.keys(bmiData),
@@ -334,7 +555,7 @@
     // Age Group Chart
     const ageCtx = document.getElementById('ageChart').getContext('2d');
     const ageData = {{ data.age_group_analysis|tojson }};
-    new Chart(ageCtx, {
+    const ageChart = new Chart(ageCtx, {
         type: 'line',
         data: {
             labels: Object.keys(ageData),
@@ -376,7 +597,7 @@
     // Children Chart
     const childrenCtx = document.getElementById('childrenChart').getContext('2d');
     const childrenData = {{ data.children_analysis|tojson }};
-    new Chart(childrenCtx, {
+    const childrenChart = new Chart(childrenCtx, {
         type: 'bar',
         data: {
             labels: Object.keys(childrenData).map(c => c + ' ' + (c === '1' ? 'Child' : 'Children')),
@@ -412,13 +633,223 @@
             }
         }
     });
+
+    // Interactive Filtering System
+    let allData = [];
+    let filteredData = [];
+    let charts = {};
+
+    // Store chart instances
+    charts.smoker = smokerChart;
+    charts.region = regionChart;
+    charts.sex = sexChart;
+    charts.bmi = bmiChart;
+    charts.age = ageChart;
+    charts.children = childrenChart;
+
+    // Load raw data
+    async function loadRawData() {
+        try {
+            const response = await fetch('/api/insurance/raw');
+            allData = await response.json();
+            filteredData = [...allData];
+            updateFilterDisplay();
+        } catch (error) {
+            console.error('Error loading data:', error);
+        }
+    }
+
+    // Filter data based on current filter values
+    function filterData() {
+        const ageMin = parseInt(document.getElementById('ageMin').value);
+        const ageMax = parseInt(document.getElementById('ageMax').value);
+        const bmiMin = parseFloat(document.getElementById('bmiMin').value);
+        const bmiMax = parseFloat(document.getElementById('bmiMax').value);
+        const chargesMin = parseFloat(document.getElementById('chargesMin').value);
+        const chargesMax = parseFloat(document.getElementById('chargesMax').value);
+        const smokerFilter = document.getElementById('smokerFilter').value;
+        const sexFilter = document.getElementById('sexFilter').value;
+        const regionFilter = document.getElementById('regionFilter').value;
+        const childrenFilter = document.getElementById('childrenFilter').value;
+
+        filteredData = allData.filter(record => {
+            const ageMatch = record.age >= ageMin && record.age <= ageMax;
+            const bmiMatch = record.bmi >= bmiMin && record.bmi <= bmiMax;
+            const chargesMatch = record.charges >= chargesMin && record.charges <= chargesMax;
+            const smokerMatch = !smokerFilter || 
+                (smokerFilter === 'yes' && record.smoker === 'yes') ||
+                (smokerFilter === 'no' && record.smoker === 'no');
+            const sexMatch = !sexFilter || record.sex.toLowerCase() === sexFilter.toLowerCase();
+            const regionMatch = !regionFilter || record.region.toLowerCase() === regionFilter.toLowerCase();
+            const childrenMatch = !childrenFilter || 
+                (childrenFilter === '4' && record.children >= 4) ||
+                (parseInt(childrenFilter) === record.children);
+
+            return ageMatch && bmiMatch && chargesMatch && smokerMatch && sexMatch && regionMatch && childrenMatch;
+        });
+
+        updateCharts();
+        updateFilterDisplay();
+    }
+
+    // Update all charts with filtered data
+    function updateCharts() {
+        if (filteredData.length === 0) return;
+
+        // Update Smoker Chart
+        const smokerData = {
+            yes: filteredData.filter(r => r.smoker === 'yes'),
+            no: filteredData.filter(r => r.smoker === 'no')
+        };
+        charts.smoker.data.datasets[0].data = [
+            smokerData.yes.length > 0 ? smokerData.yes.reduce((sum, r) => sum + r.charges, 0) / smokerData.yes.length : 0,
+            smokerData.no.length > 0 ? smokerData.no.reduce((sum, r) => sum + r.charges, 0) / smokerData.no.length : 0
+        ];
+        charts.smoker.update();
+
+        // Update Region Chart
+        const regionGroups = {};
+        filteredData.forEach(r => {
+            if (!regionGroups[r.region]) regionGroups[r.region] = [];
+            regionGroups[r.region].push(r);
+        });
+        const regionLabels = Object.keys(regionGroups).map(r => r.charAt(0).toUpperCase() + r.slice(1));
+        const regionAverages = Object.values(regionGroups).map(group => 
+            group.reduce((sum, r) => sum + r.charges, 0) / group.length
+        );
+        charts.region.data.labels = regionLabels;
+        charts.region.data.datasets[0].data = regionAverages;
+        charts.region.update();
+
+        // Update Sex Chart
+        const sexData = {
+            male: filteredData.filter(r => r.sex.toLowerCase() === 'male'),
+            female: filteredData.filter(r => r.sex.toLowerCase() === 'female')
+        };
+        charts.sex.data.datasets[0].data = [
+            sexData.male.length > 0 ? sexData.male.reduce((sum, r) => sum + r.charges, 0) / sexData.male.length : 0,
+            sexData.female.length > 0 ? sexData.female.reduce((sum, r) => sum + r.charges, 0) / sexData.female.length : 0
+        ];
+        charts.sex.update();
+
+        // Update BMI Chart
+        const bmiGroups = {
+            'Underweight': filteredData.filter(r => r.bmi < 18.5),
+            'Normal': filteredData.filter(r => r.bmi >= 18.5 && r.bmi < 25),
+            'Overweight': filteredData.filter(r => r.bmi >= 25 && r.bmi < 30),
+            'Obese': filteredData.filter(r => r.bmi >= 30)
+        };
+        const bmiLabels = Object.keys(bmiGroups);
+        const bmiAverages = Object.values(bmiGroups).map(group => 
+            group.length > 0 ? group.reduce((sum, r) => sum + r.charges, 0) / group.length : 0
+        );
+        charts.bmi.data.labels = bmiLabels;
+        charts.bmi.data.datasets[0].data = bmiAverages;
+        charts.bmi.update();
+
+        // Update Age Chart
+        const ageGroups = {};
+        filteredData.forEach(r => {
+            const group = Math.floor(r.age / 10) * 10;
+            const label = `${group}-${group + 9}`;
+            if (!ageGroups[label]) ageGroups[label] = [];
+            ageGroups[label].push(r);
+        });
+        const ageLabels = Object.keys(ageGroups).sort();
+        const ageAverages = ageLabels.map(label => 
+            ageGroups[label].reduce((sum, r) => sum + r.charges, 0) / ageGroups[label].length
+        );
+        charts.age.data.labels = ageLabels;
+        charts.age.data.datasets[0].data = ageAverages;
+        charts.age.update();
+
+        // Update Children Chart
+        const childrenGroups = {};
+        filteredData.forEach(r => {
+            const key = r.children >= 4 ? '4+' : r.children.toString();
+            if (!childrenGroups[key]) childrenGroups[key] = [];
+            childrenGroups[key].push(r);
+        });
+        const childrenLabels = Object.keys(childrenGroups).sort((a, b) => {
+            if (a === '4+') return 1;
+            if (b === '4+') return -1;
+            return parseInt(a) - parseInt(b);
+        });
+        const childrenAverages = childrenLabels.map(key => 
+            childrenGroups[key].reduce((sum, r) => sum + r.charges, 0) / childrenGroups[key].length
+        );
+        charts.children.data.labels = childrenLabels.map(c => c + ' ' + (c === '1' ? 'Child' : 'Children'));
+        charts.children.data.datasets[0].data = childrenAverages;
+        charts.children.update();
+    }
+
+    // Update filter display values
+    function updateFilterDisplay() {
+        document.getElementById('ageMinValue').textContent = document.getElementById('ageMin').value;
+        document.getElementById('ageMaxValue').textContent = document.getElementById('ageMax').value;
+        document.getElementById('bmiMinValue').textContent = document.getElementById('bmiMin').value;
+        document.getElementById('bmiMaxValue').textContent = document.getElementById('bmiMax').value;
+        document.getElementById('chargesMinValue').textContent = parseInt(document.getElementById('chargesMin').value).toLocaleString();
+        document.getElementById('chargesMaxValue').textContent = parseInt(document.getElementById('chargesMax').value).toLocaleString();
+        document.getElementById('filteredCount').textContent = filteredData.length;
+    }
+
+    // Reset all filters
+    function resetFilters() {
+        document.getElementById('ageMin').value = 18;
+        document.getElementById('ageMax').value = 64;
+        document.getElementById('bmiMin').value = 15;
+        document.getElementById('bmiMax').value = 53;
+        document.getElementById('chargesMin').value = 1000;
+        document.getElementById('chargesMax').value = 65000;
+        document.getElementById('smokerFilter').value = '';
+        document.getElementById('sexFilter').value = '';
+        document.getElementById('regionFilter').value = '';
+        document.getElementById('childrenFilter').value = '';
+        filterData();
+    }
+
+    // Event listeners
+    document.getElementById('ageMin').addEventListener('input', () => {
+        updateFilterDisplay();
+        filterData();
+    });
+    document.getElementById('ageMax').addEventListener('input', () => {
+        updateFilterDisplay();
+        filterData();
+    });
+    document.getElementById('bmiMin').addEventListener('input', () => {
+        updateFilterDisplay();
+        filterData();
+    });
+    document.getElementById('bmiMax').addEventListener('input', () => {
+        updateFilterDisplay();
+        filterData();
+    });
+    document.getElementById('chargesMin').addEventListener('input', () => {
+        updateFilterDisplay();
+        filterData();
+    });
+    document.getElementById('chargesMax').addEventListener('input', () => {
+        updateFilterDisplay();
+        filterData();
+    });
+    document.getElementById('smokerFilter').addEventListener('change', filterData);
+    document.getElementById('sexFilter').addEventListener('change', filterData);
+    document.getElementById('regionFilter').addEventListener('change', filterData);
+    document.getElementById('childrenFilter').addEventListener('change', filterData);
+    document.getElementById('resetFilters').addEventListener('click', resetFilters);
+
+    // Initialize
+    loadRawData();
 </script>
 <style>
     .stat-value-large {
-        font-size: 2em;
-        font-weight: bold;
+        font-size: 1.5em;
+        font-weight: 700;
         color: #2c3e50;
-        margin: 10px 0;
+        margin: 8px 0;
+        line-height: 1.3;
     }
     .stat-label {
         color: #7f8c8d;

@@ -47,6 +47,25 @@
     <div class="chart-container">
         <canvas id="diagnosisChart"></canvas>
     </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This pie chart displays the distribution of different medical diagnoses among patients in the dataset. Each slice represents a diagnosis category, with the size proportional to the number of patients with that condition.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The chart reveals the most common health conditions in the patient population, helping identify prevalent health issues and resource allocation needs.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding diagnosis distribution helps healthcare providers prioritize resources, plan preventive care programs, and identify public health trends.
+        </div>
+        
+        <ul>
+            <li><strong>Healthcare planning:</strong> Common diagnoses may require more resources, specialized equipment, or staff training</li>
+            <li><strong>Preventive care:</strong> Identifying prevalent conditions helps design targeted prevention and education programs</li>
+            <li><strong>Resource allocation:</strong> Healthcare facilities can use this data to ensure adequate capacity for common conditions</li>
+            <li><strong>Pattern recognition:</strong> Changes in diagnosis distribution over time can indicate emerging health trends</li>
+        </ul>
+    </div>
     <div class="distribution">
         {% for diagnosis, count in data.diagnosis_distribution.items() %}
         <div class="dist-item">
@@ -61,6 +80,25 @@
     <h2><i class="fas fa-chart-bar"></i> Age Distribution</h2>
     <div class="chart-container">
         <canvas id="ageChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart shows the age distribution of patients, grouped into age ranges. It helps visualize the demographic composition of the patient population and identify which age groups are most represented.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Age distribution patterns can reveal important demographic trends, such as an aging population or a younger patient base, which affects healthcare service planning.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding patient demographics helps healthcare providers tailor services to the needs of their specific patient population and plan for future healthcare demands.
+        </div>
+        
+        <ul>
+            <li><strong>Service planning:</strong> Different age groups have different healthcare needs - pediatric, adult, and geriatric care requirements vary significantly</li>
+            <li><strong>Resource planning:</strong> Age distribution affects staffing needs, facility design, and equipment requirements</li>
+            <li><strong>Preventive care:</strong> Age-specific screening and preventive care programs can be designed based on population demographics</li>
+            <li><strong>Trend analysis:</strong> Tracking age distribution over time helps predict future healthcare service demands</li>
+        </ul>
     </div>
     <div class="distribution">
         {% for age_group, count in data.age_distribution.items() %}
@@ -77,6 +115,25 @@
     <div class="chart-container">
         <canvas id="medicationChart"></canvas>
     </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart displays medication usage patterns across the patient population. It shows which medications are most commonly prescribed, helping identify treatment trends and medication management needs.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Common medications reflect prevalent health conditions and treatment approaches. This data helps with inventory management, drug interaction monitoring, and treatment protocol development.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding medication usage patterns helps healthcare providers optimize pharmacy inventory, identify potential drug interaction risks, and ensure appropriate medication management.
+        </div>
+        
+        <ul>
+            <li><strong>Pharmacy management:</strong> High-usage medications require adequate stock levels and may benefit from bulk purchasing</li>
+            <li><strong>Safety monitoring:</strong> Common medications need careful monitoring for side effects, interactions, and adherence</li>
+            <li><strong>Cost management:</strong> Frequently prescribed medications may be candidates for generic alternatives or formulary optimization</li>
+            <li><strong>Patient education:</strong> Common medications may require targeted patient education programs about proper usage and potential side effects</li>
+        </ul>
+    </div>
     <div class="distribution">
         {% for medication, count in data.medication_usage.items() %}
         <div class="dist-item">
@@ -91,6 +148,25 @@
     <h2><i class="fas fa-chart-line"></i> Vital Signs Overview</h2>
     <div class="chart-container">
         <canvas id="vitalSignsChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This multi-axis line chart displays vital signs (systolic blood pressure, heart rate, and temperature) across different patients. Multiple y-axes allow comparison of different measurement types on the same chart.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Vital signs are critical indicators of patient health. This visualization helps identify patterns, outliers, and correlations between different vital sign measurements.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Monitoring vital signs trends helps healthcare providers detect health issues early, track treatment effectiveness, and identify patients who may need immediate attention.
+        </div>
+        
+        <ul>
+            <li><strong>Health monitoring:</strong> Vital signs are the first indicators of patient health status and can signal the need for intervention</li>
+            <li><strong>Normal ranges:</strong> Systolic BP: 90-120 mmHg, Heart Rate: 60-100 bpm, Temperature: 97-99°F (normal ranges vary by individual)</li>
+            <li><strong>Pattern recognition:</strong> Trends in vital signs over time are often more important than single measurements</li>
+            <li><strong>Clinical decision-making:</strong> Abnormal vital signs may indicate the need for further testing, treatment adjustment, or emergency care</li>
+        </ul>
     </div>
 </div>
 

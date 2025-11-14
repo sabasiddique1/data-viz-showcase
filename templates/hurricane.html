@@ -72,6 +72,24 @@
     <div class="chart-container">
         <canvas id="categoryChart"></canvas>
     </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This doughnut chart displays the distribution of hurricanes by their Saffir-Simpson Hurricane Wind Scale category. Categories range from 1 (weakest) to 5 (strongest), based on maximum sustained wind speeds.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The chart shows which hurricane categories are most common in the dataset. Category 3+ hurricanes are considered "major" hurricanes and cause significant damage.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding hurricane category distribution helps assess regional risk levels and prepare for the most likely storm intensities.
+        </div>
+        
+        <ul>
+            <li><strong>Category Scale:</strong> Category 1 (74-95 mph), Category 2 (96-110 mph), Category 3 (111-129 mph), Category 4 (130-156 mph), Category 5 (157+ mph)</li>
+            <li><strong>Why this matters:</strong> Higher category hurricanes cause exponentially more damage and require more extensive preparation</li>
+            <li><strong>Data context:</strong> This visualization helps identify patterns in hurricane intensity for the regions covered</li>
+        </ul>
+    </div>
     <div class="distribution">
         {% for category, count in data.category_distribution.items() %}
         <div class="dist-item">
@@ -87,12 +105,50 @@
     <div class="chart-container">
         <canvas id="damageChart"></canvas>
     </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This line chart tracks hurricane damage costs over time, showing the trend of economic impact from hurricanes. The line connects data points chronologically, revealing patterns in damage costs across different years.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The trend line reveals whether hurricane damage is increasing, decreasing, or remaining stable over time. Spikes indicate particularly costly hurricane seasons.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding damage trends helps with long-term planning for disaster preparedness, insurance, and infrastructure investment in hurricane-prone areas.
+        </div>
+        
+        <ul>
+            <li><strong>Why trends matter:</strong> Increasing damage trends may indicate more intense storms, more valuable property in at-risk areas, or both</li>
+            <li><strong>Planning application:</strong> Use this data to understand historical damage patterns and prepare for future hurricane seasons</li>
+            <li><strong>Note:</strong> Damage costs are adjusted for inflation in some datasets, but this chart shows nominal values</li>
+            <li><strong>Pattern recognition:</strong> Look for clusters of high-damage years, which may indicate particularly active hurricane periods</li>
+        </ul>
+    </div>
 </div>
 
 <div class="section">
     <h2><i class="fas fa-chart-bar"></i> Wind Speed Comparison</h2>
     <div class="chart-container">
         <canvas id="windSpeedChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This bar chart compares the maximum wind speeds of different hurricanes. Each bar represents one hurricane, allowing you to see which storms had the strongest winds and compare intensities across different events.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Wind speed is a primary factor in hurricane categorization and damage potential. Higher wind speeds correlate with increased structural damage and storm surge.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding wind speed patterns helps assess the range of storm intensities in a region. This information is crucial for building codes and evacuation planning.
+        </div>
+        
+        <ul>
+            <li><strong>Wind speed impact:</strong> Damage increases exponentially with wind speed - a Category 5 hurricane causes far more damage than a Category 1</li>
+            <li><strong>Safety application:</strong> Higher wind speeds require earlier evacuation and stronger building standards</li>
+            <li><strong>Comparison value:</strong> This chart makes it easy to identify the strongest hurricanes in the dataset and compare their intensities</li>
+            <li><strong>Historical context:</strong> Some of the most destructive hurricanes in history had wind speeds exceeding 150 mph</li>
+        </ul>
     </div>
 </div>
 

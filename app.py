@@ -120,6 +120,27 @@ def api_insurance():
     """API endpoint for insurance data"""
     return jsonify(insurance_web.analyze_insurance())
 
+@app.route('/api/insurance/raw')
+def api_insurance_raw():
+    """API endpoint for raw insurance data for filtering"""
+    try:
+        raw_data = insurance_web.load_insurance_data()
+        # Convert to list of records for easier filtering
+        records = []
+        for i in range(len(raw_data['ages'])):
+            records.append({
+                'age': raw_data['ages'][i],
+                'sex': raw_data['sexes'][i],
+                'bmi': raw_data['bmis'][i],
+                'children': raw_data['num_children'][i],
+                'smoker': raw_data['smoker_statuses'][i],
+                'region': raw_data['regions'][i],
+                'charges': raw_data['insurance_charges'][i]
+            })
+        return jsonify(records)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
 if __name__ == '__main__':
     print("\n" + "="*60)
     print("Starting Flask Web Server...")
