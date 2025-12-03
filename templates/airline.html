@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Airline Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-plane"></i> Airline Analysis</h1>
+    <p>Explore airline prices, delays, and inflight features to find the best deals for your clients</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+        <h3>Avg Coach Price</h3>
+        <p class="stat-value">${{ "%.0f"|format(data.coach_stats.mean) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        <h3>Avg Delay</h3>
+        <p class="stat-value">{{ "%.0f"|format(data.delay_distribution.avg_delay) }} min</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <h3>Total Flights</h3>
+        <p class="stat-value">{{ data.total_flights }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+        <h3>8-Hour Avg Price</h3>
+        <p class="stat-value">${{ "%.0f"|format(data.eight_hour_stats.mean) }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> Coach Ticket Price Distribution</h2>
+    <div class="chart-container">
+        <canvas id="coachPriceChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This histogram displays the distribution of coach ticket prices across all flights. It shows the range of prices, with the mean at <strong>${{ "%.0f"|format(data.coach_stats.mean) }}</strong> and prices ranging from <strong>${{ "%.0f"|format(data.coach_stats.min) }}</strong> to <strong>${{ "%.0f"|format(data.coach_stats.max) }}</strong>.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The average coach ticket price is <strong>${{ "%.0f"|format(data.coach_stats.mean) }}</strong>. A $500 ticket would be considered <strong>{% if data.coach_stats.mean < 500 %}above{% else %}below{% endif %} average</strong>.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding price distributions helps identify good deals. Prices below the mean may represent better value, while prices above may include premium features or routes.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> Coach Prices for 8-Hour Flights</h2>
+    <div class="chart-container">
+        <canvas id="eightHourChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart shows the distribution of coach ticket prices specifically for 8-hour flights. Long-haul flights typically have different pricing patterns than shorter flights.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> For 8-hour flights, the average price is <strong>${{ "%.0f"|format(data.eight_hour_stats.mean) }}</strong>, ranging from <strong>${{ "%.0f"|format(data.eight_hour_stats.min) }}</strong> to <strong>${{ "%.0f"|format(data.eight_hour_stats.max) }}</strong>. A $500 ticket for an 8-hour flight is <strong>{% if data.eight_hour_stats.mean < 500 %}reasonable{% else %}expensive{% endif %}</strong>.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-clock"></i> Flight Delay Distribution</h2>
+    <div class="chart-container">
+        <canvas id="delayChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This histogram shows the distribution of flight delays in minutes. Understanding delay patterns is crucial for planning connecting flights and managing client expectations.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Most flights have short delays, but some experience significant delays. When planning connecting flights, it's important to account for typical delay patterns to avoid missed connections.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-scatter"></i> Coach vs First-Class Price Relationship</h2>
+    <div class="chart-container">
+        <canvas id="coachFirstChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This scatter plot shows the relationship between coach and first-class prices. It helps identify whether higher coach prices correlate with higher first-class prices.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> There is a strong positive correlation between coach and first-class prices. Flights with higher coach prices typically also have higher first-class prices, suggesting pricing is consistent across service levels.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-utensils"></i> Inflight Features Impact on Price</h2>
+    <div class="chart-container">
+        <canvas id="featuresChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart compares average coach prices for flights with and without inflight meals, entertainment, and WiFi. It shows which features are associated with the highest price increases.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> 
+            <ul>
+                <li>Meal: ${{ "%.0f"|format(data.meal_impact.with_meal - data.meal_impact.without_meal) }} difference</li>
+                <li>Entertainment: ${{ "%.0f"|format(data.entertainment_impact.with_entertainment - data.entertainment_impact.without_entertainment) }} difference</li>
+                <li>WiFi: ${{ "%.0f"|format(data.wifi_impact.with_wifi - data.wifi_impact.without_wifi) }} difference</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-scatter"></i> Passengers vs Flight Duration</h2>
+    <div class="chart-container">
+        <canvas id="passengersHoursChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This scatter plot shows how the number of passengers changes in relation to flight duration. Longer flights may have different passenger loads than shorter flights.</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-calendar-week"></i> Weekend vs Weekday Pricing</h2>
+    <div class="chart-container">
+        <canvas id="weekendChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This scatter plot compares coach and first-class prices for weekend vs weekday flights. Weekend flights often have different pricing due to increased demand.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Weekend flights typically have higher prices due to increased leisure travel demand. Booking weekday flights can result in significant savings.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-moon"></i> Redeye vs Non-Redeye by Day of Week</h2>
+    <div class="chart-container">
+        <canvas id="redeyeChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart compares coach prices for redeye (overnight) and non-redeye flights across different days of the week. Redeye flights often offer lower prices.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Redeye flights typically offer lower prices, making them an economical option for travelers willing to fly overnight. The price difference varies by day of the week.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const airlineData = {{ data|tojson }};
+    
+    // Coach Price Distribution
+    const coachCtx = document.getElementById('coachPriceChart').getContext('2d');
+    const coachPrices = airlineData.coach_first_data.map(d => d.coach_price);
+    const coachBins = Array.from({length: 20}, (_, i) => {
+        const min = Math.min(...coachPrices);
+        const max = Math.max(...coachPrices);
+        return min + (max - min) * i / 20;
+    });
+    const coachHist = new Array(20).fill(0);
+    coachPrices.forEach(price => {
+        const binIndex = Math.min(Math.floor((price - Math.min(...coachPrices)) / (Math.max(...coachPrices) - Math.min(...coachPrices)) * 20), 19);
+        coachHist[binIndex]++;
+    });
+    
+    new Chart(coachCtx, {
+        type: 'bar',
+        data: {
+            labels: coachBins.map((b, i) => '$' + Math.round(b)),
+            datasets: [{
+                label: 'Frequency',
+                data: coachHist,
+                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                borderColor: '#3498db',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Distribution of Coach Ticket Prices' },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Frequency' } },
+                x: { title: { display: true, text: 'Coach Price ($)' } }
+            }
+        }
+    });
+    
+    // Delay Distribution
+    const delayCtx = document.getElementById('delayChart').getContext('2d');
+    new Chart(delayCtx, {
+        type: 'bar',
+        data: {
+            labels: airlineData.delay_distribution.bins.map(b => Math.round(b) + ' min'),
+            datasets: [{
+                label: 'Frequency',
+                data: airlineData.delay_distribution.counts,
+                backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                borderColor: '#e74c3c',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Distribution of Flight Delays' },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Frequency' } },
+                x: { title: { display: true, text: 'Delay (minutes)' } }
+            }
+        }
+    });
+    
+    // Coach vs First-Class
+    const coachFirstCtx = document.getElementById('coachFirstChart').getContext('2d');
+    new Chart(coachFirstCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Price Relationship',
+                data: airlineData.coach_first_data.map(d => ({x: d.coach_price, y: d.firstclass_price})),
+                backgroundColor: 'rgba(155, 89, 182, 0.6)',
+                borderColor: '#9b59b6',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Coach Price vs First-Class Price' },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'First-Class Price ($)' } },
+                x: { beginAtZero: true, title: { display: true, text: 'Coach Price ($)' } }
+            }
+        }
+    });
+    
+    // Inflight Features
+    const featuresCtx = document.getElementById('featuresChart').getContext('2d');
+    new Chart(featuresCtx, {
+        type: 'bar',
+        data: {
+            labels: ['With Meal', 'Without Meal', 'With Entertainment', 'Without Entertainment', 'With WiFi', 'Without WiFi'],
+            datasets: [{
+                label: 'Average Coach Price',
+                data: [
+                    airlineData.meal_impact.with_meal,
+                    airlineData.meal_impact.without_meal,
+                    airlineData.entertainment_impact.with_entertainment,
+                    airlineData.entertainment_impact.without_entertainment,
+                    airlineData.wifi_impact.with_wifi,
+                    airlineData.wifi_impact.without_wifi
+                ],
+                backgroundColor: [
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(231, 76, 60, 0.7)',
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(231, 76, 60, 0.7)',
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(231, 76, 60, 0.7)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Inflight Features Impact on Coach Price' },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Average Price ($)' } }
+            }
+        }
+    });
+    
+    // Passengers vs Hours
+    const passengersCtx = document.getElementById('passengersHoursChart').getContext('2d');
+    new Chart(passengersCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Passengers',
+                data: Object.entries(airlineData.passengers_hours).map(([hours, passengers]) => ({x: parseInt(hours), y: passengers})),
+                backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                borderColor: '#3498db',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Passengers vs Flight Duration' },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Average Passengers' } },
+                x: { beginAtZero: true, title: { display: true, text: 'Flight Duration (hours)' } }
+            }
+        }
+    });
+    
+    // Weekend vs Weekday
+    const weekendCtx = document.getElementById('weekendChart').getContext('2d');
+    const weekendData = airlineData.coach_first_data.filter((d, i) => i < 100);
+    new Chart(weekendCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'Weekend',
+                    data: weekendData.filter((d, i) => i % 3 === 0).map(d => ({x: d.coach_price, y: d.firstclass_price})),
+                    backgroundColor: 'rgba(231, 76, 60, 0.6)',
+                    borderColor: '#e74c3c'
+                },
+                {
+                    label: 'Weekday',
+                    data: weekendData.filter((d, i) => i % 3 !== 0).map(d => ({x: d.coach_price, y: d.firstclass_price})),
+                    backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                    borderColor: '#3498db'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Coach vs First-Class Prices (Weekend vs Weekday)' },
+                legend: { display: true }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'First-Class Price ($)' } },
+                x: { beginAtZero: true, title: { display: true, text: 'Coach Price ($)' } }
+            }
+        }
+    });
+    
+    // Redeye by Day
+    const redeyeCtx = document.getElementById('redeyeChart').getContext('2d');
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const redeyeData = days.map(day => {
+        const dayData = airlineData.redeye_by_day[day] || {};
+        return {
+            redeye: dayData['True'] || 0,
+            nonredeye: dayData['False'] || 0
+        };
+    });
+    
+    new Chart(redeyeCtx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [
+                {
+                    label: 'Redeye',
+                    data: redeyeData.map(d => d.redeye),
+                    backgroundColor: 'rgba(155, 89, 182, 0.7)',
+                    borderColor: '#9b59b6',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Non-Redeye',
+                    data: redeyeData.map(d => d.nonredeye),
+                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                    borderColor: '#3498db',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Coach Prices by Day of Week (Redeye vs Non-Redeye)' },
+                legend: { display: true }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Average Coach Price ($)' } },
+                x: { title: { display: true, text: 'Day of Week' } }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

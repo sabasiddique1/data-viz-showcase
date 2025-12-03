@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Life Expectancy and GDP Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-globe-americas"></i> Life Expectancy and GDP Analysis</h1>
+    <p>Explore the relationship between GDP and life expectancy across different countries (2000-2015)</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-link"></i></div>
+        <h3>Correlation</h3>
+        <p class="stat-value">{{ "%.3f"|format(data.correlation) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-flag"></i></div>
+        <h3>Countries</h3>
+        <p class="stat-value">{{ data.countries|length }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+        <h3>Years Analyzed</h3>
+        <p class="stat-value">{{ data.years|length }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-info-circle"></i> About This Analysis</h2>
+    <div class="chart-description">
+        <p>This analysis explores the relationship between Gross Domestic Product (GDP) and life expectancy at birth across multiple countries from 2000 to 2015. Understanding this relationship helps identify how economic factors influence health outcomes.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The overall correlation between GDP and life expectancy is <strong>{{ "%.3f"|format(data.correlation) }}</strong>, indicating a <strong>{% if data.correlation > 0.7 %}strong positive{% elif data.correlation > 0.4 %}moderate positive{% else %}weak{% endif %}</strong> relationship.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Higher GDP generally correlates with higher life expectancy, suggesting that economic prosperity enables better healthcare, nutrition, and living conditions. However, the relationship varies by country and over time.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Life Expectancy Distribution by Country</h2>
+    <div class="chart-container">
+        <canvas id="lifeExpectancyChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This violin plot shows the distribution of life expectancy values for each country over the period 2000-2015. The width of each violin represents the density of data points at different life expectancy values.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Countries show different distributions of life expectancy. Some countries have consistent high values, while others show more variation or lower overall life expectancy.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-scatter"></i> GDP vs Life Expectancy by Country</h2>
+    <div class="chart-container">
+        <canvas id="gdpLifeChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This scatter plot shows the relationship between GDP and life expectancy for each country. Each point represents a year, and different colors represent different countries.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The scatter plot reveals how GDP and life expectancy are related for each country. Countries with higher GDP tend to cluster in the upper-right region (high GDP, high life expectancy).
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> GDP Over Time by Country</h2>
+    <div class="chart-container">
+        <canvas id="gdpTimeChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This line chart shows how GDP has changed over time (2000-2015) for each country. It helps identify economic growth trends and compare countries' economic trajectories.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Most countries show increasing GDP over time, though the rate of growth varies significantly. Some countries experience rapid growth, while others show more gradual increases.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> Life Expectancy Over Time by Country</h2>
+    <div class="chart-container">
+        <canvas id="lifeTimeChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This line chart shows how life expectancy has changed over time (2000-2015) for each country. It reveals trends in health outcomes and helps identify countries with improving or declining life expectancy.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Life expectancy generally increases over time across most countries, reflecting improvements in healthcare, nutrition, and living conditions. However, the rate of improvement varies.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-table"></i> Summary Statistics by Country</h2>
+    <div class="info-cards">
+        {% for country in data.countries %}
+        <div class="info-card">
+            <h3><i class="fas fa-flag"></i> {{ country }}</h3>
+            <p><strong>Life Expectancy:</strong> 
+                Mean: {{ "%.1f"|format(data.summary_by_country[country]['Life expectancy at birth (years)']['mean']) }} years
+                (Range: {{ "%.1f"|format(data.summary_by_country[country]['Life expectancy at birth (years)']['min']) }}-{{ "%.1f"|format(data.summary_by_country[country]['Life expectancy at birth (years)']['max']) }})
+            </p>
+            <p><strong>GDP:</strong> 
+                Mean: ${{ "%.0f"|format(data.summary_by_country[country]['GDP']['mean']) }}
+                (Range: ${{ "%.0f"|format(data.summary_by_country[country]['GDP']['min']) }}-${{ "%.0f"|format(data.summary_by_country[country]['GDP']['max']) }})
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const lifeData = {{ data|tojson }};
+    const colors = [
+        'rgba(231, 76, 60, 0.7)',
+        'rgba(52, 152, 219, 0.7)',
+        'rgba(46, 204, 113, 0.7)',
+        'rgba(155, 89, 182, 0.7)',
+        'rgba(241, 196, 15, 0.7)',
+        'rgba(230, 126, 34, 0.7)'
+    ];
+    
+    // Life Expectancy Distribution (Violin-like using box plot)
+    const lifeCtx = document.getElementById('lifeExpectancyChart').getContext('2d');
+    const lifeDatasets = lifeData.countries.map((country, i) => ({
+        label: country,
+        data: lifeData.life_expectancy_by_country[country],
+        backgroundColor: colors[i % colors.length],
+        borderColor: colors[i % colors.length].replace('0.7', '1'),
+        borderWidth: 2
+    }));
+    
+    new Chart(lifeCtx, {
+        type: 'bar',
+        data: {
+            labels: lifeData.countries,
+            datasets: lifeDatasets.map((ds, i) => ({
+                ...ds,
+                data: [lifeData.life_expectancy_by_country[lifeData.countries[i]].reduce((a, b) => a + b, 0) / lifeData.life_expectancy_by_country[lifeData.countries[i]].length]
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Average Life Expectancy by Country (2000-2015)' },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: false, title: { display: true, text: 'Life Expectancy (years)' } },
+                x: { title: { display: true, text: 'Country' } }
+            }
+        }
+    });
+    
+    // GDP vs Life Expectancy
+    const gdpLifeCtx = document.getElementById('gdpLifeChart').getContext('2d');
+    const gdpLifeDatasets = lifeData.countries.map((country, i) => ({
+        label: country,
+        data: lifeData.gdp_life_by_country[country].gdp.map((gdp, j) => ({
+            x: gdp,
+            y: lifeData.gdp_life_by_country[country].life_expectancy[j]
+        })),
+        backgroundColor: colors[i % colors.length],
+        borderColor: colors[i % colors.length].replace('0.7', '1'),
+        borderWidth: 1
+    }));
+    
+    new Chart(gdpLifeCtx, {
+        type: 'scatter',
+        data: {
+            datasets: gdpLifeDatasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'GDP vs Life Expectancy by Country (2000-2015)' },
+                legend: { display: true, position: 'bottom' }
+            },
+            scales: {
+                y: { beginAtZero: false, title: { display: true, text: 'Life Expectancy at Birth (years)' } },
+                x: { beginAtZero: true, title: { display: true, text: 'GDP (USD)' } }
+            }
+        }
+    });
+    
+    // GDP Over Time
+    const gdpTimeCtx = document.getElementById('gdpTimeChart').getContext('2d');
+    const gdpTimeDatasets = lifeData.countries.map((country, i) => ({
+        label: country,
+        data: lifeData.gdp_over_time[country].gdp,
+        borderColor: colors[i % colors.length],
+        backgroundColor: colors[i % colors.length].replace('0.7', '0.1'),
+        borderWidth: 2,
+        fill: false,
+        tension: 0.1
+    }));
+    
+    new Chart(gdpTimeCtx, {
+        type: 'line',
+        data: {
+            labels: lifeData.gdp_over_time[lifeData.countries[0]].years,
+            datasets: gdpTimeDatasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'GDP Over Time by Country (2000-2015)' },
+                legend: { display: true, position: 'bottom' }
+            },
+            scales: {
+                y: { beginAtZero: false, title: { display: true, text: 'GDP (USD)' } },
+                x: { title: { display: true, text: 'Year' } }
+            }
+        }
+    });
+    
+    // Life Expectancy Over Time
+    const lifeTimeCtx = document.getElementById('lifeTimeChart').getContext('2d');
+    const lifeTimeDatasets = lifeData.countries.map((country, i) => ({
+        label: country,
+        data: lifeData.life_over_time[country].life_expectancy,
+        borderColor: colors[i % colors.length],
+        backgroundColor: colors[i % colors.length].replace('0.7', '0.1'),
+        borderWidth: 2,
+        fill: false,
+        tension: 0.1
+    }));
+    
+    new Chart(lifeTimeCtx, {
+        type: 'line',
+        data: {
+            labels: lifeData.life_over_time[lifeData.countries[0]].years,
+            datasets: lifeTimeDatasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Life Expectancy Over Time by Country (2000-2015)' },
+                legend: { display: true, position: 'bottom' }
+            },
+            scales: {
+                y: { beginAtZero: false, title: { display: true, text: 'Life Expectancy at Birth (years)' } },
+                x: { title: { display: true, text: 'Year' } }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

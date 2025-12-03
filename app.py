@@ -12,6 +12,10 @@ import linear_regression
 import funnel_analysis
 import student_analysis
 import nba_analysis
+import mushroom_analysis
+import airline_analysis
+import life_expectancy_analysis
+import census_analysis
 
 app = Flask(__name__)
 
@@ -201,12 +205,72 @@ def api_nba():
     """API endpoint for NBA data"""
     return jsonify(nba_analysis.analyze_nba())
 
+@app.route('/mushrooms')
+def mushrooms():
+    """Mushroom analysis page"""
+    try:
+        results = mushroom_analysis.analyze_mushrooms()
+        return render_template('mushrooms.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/airline')
+def airline():
+    """Airline analysis page"""
+    try:
+        results = airline_analysis.analyze_airline()
+        return render_template('airline.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/life-expectancy')
+def life_expectancy():
+    """Life expectancy analysis page"""
+    try:
+        results = life_expectancy_analysis.analyze_life_expectancy()
+        return render_template('life_expectancy.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/census')
+def census():
+    """Census analysis page"""
+    try:
+        results = census_analysis.analyze_census()
+        return render_template('census.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/api/mushrooms')
+def api_mushrooms():
+    """API endpoint for mushroom data"""
+    return jsonify(mushroom_analysis.analyze_mushrooms())
+
+@app.route('/api/airline')
+def api_airline():
+    """API endpoint for airline data"""
+    return jsonify(airline_analysis.analyze_airline())
+
+@app.route('/api/life-expectancy')
+def api_life_expectancy():
+    """API endpoint for life expectancy data"""
+    return jsonify(life_expectancy_analysis.analyze_life_expectancy())
+
+@app.route('/api/census')
+def api_census():
+    """API endpoint for census data"""
+    return jsonify(census_analysis.analyze_census())
+
 if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 8080))
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
     print("\n" + "="*60)
     print("Starting Flask Web Server...")
     print("="*60)
-    print("Open your browser and navigate to: http://localhost:8080")
+    print(f"Open your browser and navigate to: http://localhost:{port}")
     print("Press Ctrl+C to stop the server")
     print("="*60 + "\n")
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)
 

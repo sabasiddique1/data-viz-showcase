@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Exploring Mushrooms{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-seedling"></i> Exploring Mushrooms</h1>
+    <p>Analyze mushroom dataset characteristics and categorical feature distributions</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-database"></i></div>
+        <h3>Total Samples</h3>
+        <p class="stat-value">{{ data.total_samples }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-list"></i></div>
+        <h3>Features Analyzed</h3>
+        <p class="stat-value">{{ data.columns|length }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-info-circle"></i> About This Analysis</h2>
+    <div class="chart-description">
+        <p>This analysis explores a mushroom dataset by creating countplots for all categorical features. Each chart shows the distribution of values for a specific mushroom characteristic, helping identify patterns and relationships in the data.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The dataset contains <strong>{{ data.total_samples }}</strong> mushroom samples with multiple categorical features. Each feature is analyzed to show value counts, helping understand the distribution of characteristics across the dataset.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding feature distributions is crucial for data exploration. Countplots help identify common vs. rare characteristics, which can be valuable for classification tasks or identifying patterns in biological data.
+        </div>
+    </div>
+</div>
+
+<div id="mushroomCharts">
+    {% for column in data.columns %}
+    <div class="section">
+        <h2><i class="fas fa-chart-bar"></i> {{ column|replace('-', ' ')|title }} Distribution</h2>
+        <div class="chart-container">
+            <canvas id="chart_{{ loop.index0 }}"></canvas>
+        </div>
+        <div class="chart-description">
+            <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+            <p>This countplot displays the distribution of values for the <strong>{{ column }}</strong> feature. It shows how many mushrooms have each possible value for this characteristic.</p>
+            
+            <div class="insight-box">
+                <strong>Key Insight:</strong> This feature has <strong>{{ data.column_stats[column].unique_count }}</strong> unique values. The chart shows which values are most common in the dataset.
+            </div>
+        </div>
+        <div class="distribution" style="margin-top: 2rem;">
+            {% for label, value in data.column_stats[column].value_counts.items() %}
+            <div class="dist-item">
+                <span class="dist-label">{{ label }}:</span>
+                <span class="dist-value">{{ value }} samples</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const mushroomData = {{ data|tojson }};
+    
+    // Create charts for each column
+    mushroomData.columns.forEach((column, index) => {
+        const stats = mushroomData.column_stats[column];
+        const ctx = document.getElementById('chart_' + index).getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: stats.labels,
+                datasets: [{
+                    label: 'Count',
+                    data: stats.values,
+                    backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                    borderColor: '#2ecc71',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: column.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) + ' Value Counts'
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Count'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: column.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+

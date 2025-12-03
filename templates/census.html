@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}US Census Data Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-flag-usa"></i> US Census Data Analysis</h1>
+    <p>Clean and analyze US census data including income, population, and demographic distributions</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-map-marked-alt"></i></div>
+        <h3>Total States</h3>
+        <p class="stat-value">{{ data.summary.total_states }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+        <h3>Avg Income</h3>
+        <p class="stat-value">${{ "%.0f"|format(data.summary.avg_income) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <h3>Avg Population</h3>
+        <p class="stat-value">{{ "%.0f"|format(data.summary.avg_population / 1000000) }}M</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-venus"></i></div>
+        <h3>Avg Women</h3>
+        <p class="stat-value">{{ "%.0f"|format(data.summary.avg_women / 1000000) }}M</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-info-circle"></i> About This Analysis</h2>
+    <div class="chart-description">
+        <p>This analysis cleans and explores US census data, examining relationships between income, population demographics, and racial distributions across states. The data has been cleaned to remove formatting characters and handle missing values.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The dataset contains information for <strong>{{ data.summary.total_states }}</strong> states, with an average income of <strong>${{ "%.0f"|format(data.summary.avg_income) }}</strong> and an average population of <strong>{{ "%.1f"|format(data.summary.avg_population / 1000000) }} million</strong>.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Census data provides valuable insights into demographic patterns, economic conditions, and social structures across different states. Understanding these patterns helps inform policy decisions and resource allocation.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-scatter"></i> Women Population vs Average Income</h2>
+    <div class="chart-container">
+        <canvas id="womenIncomeChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This scatter plot shows the relationship between the number of women in each state and the average income. It helps identify whether population size correlates with economic prosperity.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The scatter plot reveals how income varies with population size. States with larger populations may show different income patterns than smaller states.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Race Percentage Distributions</h2>
+    <div class="chart-container">
+        <canvas id="raceDistChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>These histograms show the distribution of racial percentages across all states. Each chart represents a different racial/ethnic group and shows how that percentage varies from state to state.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The distributions show significant variation in racial demographics across states. Some states have higher concentrations of certain groups, reflecting historical migration patterns and regional characteristics.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding demographic distributions helps identify diversity patterns and can inform discussions about representation, resource allocation, and social equity.
+        </div>
+    </div>
+    <div class="distribution" style="margin-top: 2rem;">
+        <h4>Average Percentages by Race/Ethnicity:</h4>
+        {% for race, avg in data.race_averages.items() %}
+        <div class="dist-item">
+            <span class="dist-label">{{ race }}:</span>
+            <span class="dist-value">{{ "%.2f"|format(avg) }}%</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Individual Race Distributions</h2>
+    {% for race, values in data.race_distributions.items() %}
+    <div class="section" style="margin-top: 1rem;">
+        <h3>{{ race }} Percentage Distribution</h3>
+        <div class="chart-container">
+            <canvas id="raceChart_{{ loop.index0 }}"></canvas>
+        </div>
+        <div class="chart-description">
+            <p>This histogram shows the distribution of <strong>{{ race }}</strong> percentage across all states. It reveals how common different percentage ranges are.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const censusData = {{ data|tojson }};
+    
+    // Women vs Income Scatter
+    const womenIncomeCtx = document.getElementById('womenIncomeChart').getContext('2d');
+    new Chart(womenIncomeCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'States',
+                data: censusData.women_income_data.map(d => ({x: d.Women, y: d.Income})),
+                backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                borderColor: '#3498db',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Average Income vs Number of Women per State' },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: false, title: { display: true, text: 'Average Income (USD)' } },
+                x: { beginAtZero: true, title: { display: true, text: 'Women Population' } }
+            }
+        }
+    });
+    
+    // Race Distribution Overview
+    const raceDistCtx = document.getElementById('raceDistChart').getContext('2d');
+    const raceLabels = Object.keys(censusData.race_averages);
+    const raceAverages = Object.values(censusData.race_averages);
+    
+    new Chart(raceDistCtx, {
+        type: 'bar',
+        data: {
+            labels: raceLabels,
+            datasets: [{
+                label: 'Average Percentage',
+                data: raceAverages,
+                backgroundColor: [
+                    'rgba(231, 76, 60, 0.7)',
+                    'rgba(52, 152, 219, 0.7)',
+                    'rgba(46, 204, 113, 0.7)',
+                    'rgba(155, 89, 182, 0.7)',
+                    'rgba(241, 196, 15, 0.7)',
+                    'rgba(230, 126, 34, 0.7)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: { display: true, text: 'Average Race/Ethnicity Percentages Across States' },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Average Percentage (%)' } },
+                x: { title: { display: true, text: 'Race/Ethnicity' } }
+            }
+        }
+    });
+    
+    // Individual Race Histograms
+    const raceColors = [
+        'rgba(231, 76, 60, 0.7)',
+        'rgba(52, 152, 219, 0.7)',
+        'rgba(46, 204, 113, 0.7)',
+        'rgba(155, 89, 182, 0.7)',
+        'rgba(241, 196, 15, 0.7)',
+        'rgba(230, 126, 34, 0.7)'
+    ];
+    
+    Object.entries(censusData.race_distributions).forEach(([race, values], index) => {
+        const ctx = document.getElementById('raceChart_' + index).getContext('2d');
+        
+        // Create bins for histogram
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const binCount = 10;
+        const binSize = (max - min) / binCount;
+        const bins = Array.from({length: binCount}, (_, i) => min + i * binSize);
+        const binCounts = new Array(binCount).fill(0);
+        
+        values.forEach(val => {
+            const binIndex = Math.min(Math.floor((val - min) / binSize), binCount - 1);
+            binCounts[binIndex]++;
+        });
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: bins.map((b, i) => (b + binSize/2).toFixed(1) + '%'),
+                datasets: [{
+                    label: 'Number of States',
+                    data: binCounts,
+                    backgroundColor: raceColors[index % raceColors.length],
+                    borderColor: raceColors[index % raceColors.length].replace('0.7', '1'),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: { display: true, text: `Distribution of ${race} Percentage Across States` },
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, title: { display: true, text: 'Number of States' } },
+                    x: { title: { display: true, text: `${race} (%)` } }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+
