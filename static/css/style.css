@@ -780,17 +780,17 @@ body {
 }
 
 .question-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
     border-radius: 15px;
     padding: 2rem;
     border-left: 5px solid #667eea;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px var(--shadow);
 }
 
 .question-card:hover {
     transform: translateX(5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px var(--shadow-hover);
 }
 
 .question-header {
@@ -864,12 +864,13 @@ body {
 }
 
 .cipher-example {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
     border-radius: 15px;
     padding: 2rem;
     margin-top: 1rem;
     border-left: 5px solid #667eea;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px var(--shadow);
+    transition: background 0.3s ease;
 }
 
 .cipher-step {

@@ -847,12 +847,12 @@
     .stat-value-large {
         font-size: 1.5em;
         font-weight: 700;
-        color: #2c3e50;
+        color: var(--text-primary);
         margin: 8px 0;
         line-height: 1.3;
     }
     .stat-label {
-        color: #7f8c8d;
+        color: var(--text-secondary);
         font-size: 0.9em;
     }
     .highlight-card {
@@ -862,18 +862,20 @@
         border-left-color: #e74c3c;
     }
     .insights-box {
-        background: #f8f9fa;
+        background: var(--bg-tertiary);
         border-radius: 8px;
         padding: 20px;
+        transition: background-color 0.3s ease;
     }
     .insight-item {
         display: flex;
         align-items: flex-start;
         margin-bottom: 20px;
         padding: 15px;
-        background: white;
+        background: var(--bg-secondary);
         border-radius: 6px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px var(--shadow);
+        transition: all 0.3s ease;
     }
     .insight-item i {
         font-size: 2em;
@@ -883,11 +885,11 @@
     }
     .insight-item h4 {
         margin: 0 0 5px 0;
-        color: #2c3e50;
+        color: var(--text-primary);
     }
     .insight-item p {
         margin: 0;
-        color: #555;
+        color: var(--text-secondary);
         line-height: 1.6;
     }
 </style>
