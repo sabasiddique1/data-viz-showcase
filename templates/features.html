@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Feature Transformation Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-cogs"></i> Feature Transformation Analysis</h1>
+    <p>Transform categorical data into numeric features for machine learning</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-database"></i></div>
+        <h3>Total Reviews</h3>
+        <p class="stat-value">{{ data.sample_size }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-list"></i></div>
+        <h3>Features Created</h3>
+        <p class="stat-value">{{ data.feature_count }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>Departments</h3>
+        <p class="stat-value">{{ data.transformation_summary.one_hot_encoding.departments|length }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-exchange-alt"></i> Binary Transformation</h2>
+    <div class="chart-container">
+        <canvas id="binaryChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart shows the transformation of the "recommended" feature from boolean (True/False) to binary numeric values (1/0). This is essential for machine learning algorithms that require numeric input.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Binary encoding converts categorical boolean data into numeric format. True becomes 1 and False becomes 0, making the data compatible with mathematical operations.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Most machine learning algorithms require numeric features. Binary encoding is the simplest way to convert boolean/categorical yes/no features.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-sort-numeric-up"></i> Rating Transformation</h2>
+    <div class="chart-container">
+        <canvas id="ratingChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart shows the transformation of text ratings ("Loved it", "Liked it", etc.) into numeric values (5, 4, 3, 2, 1). This preserves the ordinal relationship between ratings.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Ordinal encoding preserves the order and magnitude of ratings. Higher numbers represent better ratings, allowing algorithms to understand the relationship between values.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> When categorical data has an inherent order (like ratings), numeric encoding should preserve that order to maintain meaningful relationships.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-th"></i> One-Hot Encoding - Department Distribution</h2>
+    <div class="chart-container">
+        <canvas id="oneHotChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart shows the distribution of reviews across different departments after one-hot encoding. Each department becomes a separate binary feature (0 or 1).</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> One-hot encoding creates separate binary columns for each category. This prevents algorithms from incorrectly assuming ordinal relationships between categories.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> One-hot encoding is ideal for nominal (non-ordered) categorical data. It creates one column per category, with 1 indicating presence and 0 indicating absence.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const binaryData = {{ data.transformation_summary.binary_transformation|tojson }};
+    const ratingData = {{ data.transformation_summary.rating_transformation|tojson }};
+    const oneHotData = {{ data.transformation_summary.one_hot_encoding|tojson }};
+    
+    // Binary transformation chart
+    const ctx1 = document.getElementById('binaryChart').getContext('2d');
+    const binaryChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(binaryData.original),
+            datasets: [{
+                label: 'Original (Boolean)',
+                data: Object.values(binaryData.original),
+                backgroundColor: 'rgba(102, 126, 234, 0.6)'
+            }, {
+                label: 'Transformed (Binary)',
+                data: Object.values(binaryData.transformed),
+                backgroundColor: 'rgba(255, 99, 132, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Count' } }
+            }
+        }
+    });
+    
+    // Rating transformation chart
+    const ctx2 = document.getElementById('ratingChart').getContext('2d');
+    const ratingChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(ratingData.original),
+            datasets: [{
+                label: 'Original (Text)',
+                data: Object.values(ratingData.original),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)'
+            }, {
+                label: 'Transformed (Numeric)',
+                data: Object.values(ratingData.transformed),
+                backgroundColor: 'rgba(255, 206, 86, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Count' } }
+            }
+        }
+    });
+    
+    // One-hot encoding chart
+    const ctx3 = document.getElementById('oneHotChart').getContext('2d');
+    const oneHotChart = new Chart(ctx3, {
+        type: 'bar',
+        data: {
+            labels: oneHotData.departments,
+            datasets: [{
+                label: 'Review Count by Department',
+                data: Object.values(oneHotData.sample_counts),
+                backgroundColor: 'rgba(75, 192, 192, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Number of Reviews' } }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

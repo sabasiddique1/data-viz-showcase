@@ -11,7 +11,7 @@ def load_mushroom_data():
     """Load mushroom data from CSV file"""
     try:
         # Try to load from data directory first
-        csv_path = os.path.join('data', 'mushroom_data.csv')
+        csv_path = os.path.join('csv', 'mushroom_data.csv')
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
             # Convert column names to lowercase with hyphens for consistency

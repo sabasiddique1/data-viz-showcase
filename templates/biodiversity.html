@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Biodiversity Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-tree"></i> Biodiversity in National Parks</h1>
+    <p>Analyze species conservation status and observations in national parks</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-leaf"></i></div>
+        <h3>Total Species</h3>
+        <p class="stat-value">{{ data.total_species }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-binoculars"></i></div>
+        <h3>Total Observations</h3>
+        <p class="stat-value">{{ data.total_observations }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-shield-alt"></i> Conservation Status Distribution</h2>
+    <div class="chart-container">
+        <canvas id="statusChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart displays the number of species in each conservation status category. It helps identify how many species require protection or intervention.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Most species have "No Intervention" status, while smaller numbers are classified as "Species of Concern", "Endangered", "Threatened", or "In Recovery".
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding conservation status distribution helps prioritize conservation efforts and allocate resources to species most in need of protection.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-percentage"></i> Percent Protected by Category</h2>
+    <div class="chart-container">
+        <canvas id="protectionChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart shows the percentage of protected species (those with conservation status other than "No Intervention") within each category (Mammal, Bird, Reptile, etc.).</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Some categories have higher protection rates than others, indicating which types of species are more likely to be at risk or require conservation efforts.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Categories with higher protection percentages may indicate groups that are more vulnerable or have historically received more conservation attention.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-star"></i> Top Observed Species</h2>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Common Name</th>
+                    <th>Category</th>
+                    <th>Observations</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for species in data.top_species[:10] %}
+                <tr>
+                    <td>{{ species.common_name }}</td>
+                    <td>{{ species.category }}</td>
+                    <td>{{ species.observations }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const statusData = {{ data.status_distribution|tojson }};
+    const protectionData = {{ data.category_protection|tojson }};
+    
+    // Conservation status chart
+    const ctx1 = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: statusData.statuses,
+            datasets: [{
+                label: 'Number of Species',
+                data: statusData.counts,
+                backgroundColor: 'rgba(102, 126, 234, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Number of Species' } }
+            }
+        }
+    });
+    
+    // Protection by category chart
+    const ctx2 = document.getElementById('protectionChart').getContext('2d');
+    const protectionChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: protectionData.categories,
+            datasets: [{
+                label: 'Percent Protected',
+                data: protectionData.percent_protected,
+                backgroundColor: 'rgba(255, 99, 132, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { beginAtZero: true, max: 100, title: { display: true, text: 'Percent Protected (%)' } }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

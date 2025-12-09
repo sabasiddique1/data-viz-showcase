@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}A/B Testing Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-vial"></i> A/B Testing Analysis - Farmburg</h1>
+    <p>Analyze A/B test results for conversion rates and statistical significance</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <h3>Total Users</h3>
+        <p class="stat-value">{{ data.overall_stats.total_users }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+        <h3>Total Purchases</h3>
+        <p class="stat-value">{{ data.overall_stats.total_purchases }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+        <h3>Overall Conversion</h3>
+        <p class="stat-value">{{ "%.2f"|format(data.overall_stats.overall_conversion_rate) }}%</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+        <h3>Significant</h3>
+        <p class="stat-value">{{ "Yes" if data.statistical_test.significant else "No" }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Conversion Rate Comparison</h2>
+    <div class="chart-container">
+        <canvas id="conversionChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart compares the conversion rates between Group A (control) and Group B (treatment). It shows which group had a higher percentage of users who made a purchase.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Group A has a conversion rate of <strong>{{ "%.2f"|format(data.group_a.conversion_rate) }}%</strong> while Group B has <strong>{{ "%.2f"|format(data.group_b.conversion_rate) }}%</strong>. The difference is <strong>{{ "%.2f"|format(data.comparison.conversion_difference) }}%</strong> with a relative lift of <strong>{{ "%.2f"|format(data.comparison.relative_lift_percent) }}%</strong>.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Conversion rate differences help measure the impact of changes. A positive lift indicates the treatment group performed better than the control group.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-pie"></i> Purchase Distribution by Group</h2>
+    <div class="chart-container">
+        <canvas id="purchaseChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart shows the breakdown of purchases vs. non-purchases for each group. It provides a visual representation of the conversion funnel for both groups.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Group A had <strong>{{ data.group_a.purchases }}</strong> purchases out of <strong>{{ data.group_a.users }}</strong> users, while Group B had <strong>{{ data.group_b.purchases }}</strong> purchases out of <strong>{{ data.group_b.users }}</strong> users.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Understanding the absolute numbers alongside percentages helps assess the practical significance of the test results.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-flask"></i> Statistical Test Results</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-calculator"></i></div>
+            <h3>Chi-Square Statistic</h3>
+            <p class="stat-value">{{ "%.4f"|format(data.statistical_test.chi2) }}</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+            <h3>P-Value</h3>
+            <p class="stat-value">{{ "%.6f"|format(data.statistical_test.p_value) }}</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3>Degrees of Freedom</h3>
+            <p class="stat-value">{{ data.statistical_test.degrees_of_freedom }}</p>
+        </div>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Means</h4>
+        <p>The chi-square test determines if there's a statistically significant difference between the two groups. A p-value less than 0.05 indicates statistical significance.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The test shows a p-value of <strong>{{ "%.6f"|format(data.statistical_test.p_value) }}</strong>, which is {% if data.statistical_test.significant %}<strong>statistically significant</strong> (p < 0.05){% else %}<strong>not statistically significant</strong> (p ≥ 0.05){% endif %}. This means {% if data.statistical_test.significant %}we can confidently say there is a real difference{% else %}we cannot conclude there is a real difference{% endif %} between the groups.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Statistical significance helps distinguish between real effects and random variation. However, practical significance (the size of the effect) is also important for business decisions.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const abTestData = {{ data|tojson }};
+    
+    // Conversion rate comparison chart
+    const ctx1 = document.getElementById('conversionChart').getContext('2d');
+    const conversionChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Group A (Control)', 'Group B (Treatment)'],
+            datasets: [{
+                label: 'Conversion Rate (%)',
+                data: [abTestData.group_a.conversion_rate, abTestData.group_b.conversion_rate],
+                backgroundColor: ['rgba(102, 126, 234, 0.6)', 'rgba(255, 99, 132, 0.6)']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Conversion Rate (%)' } }
+            }
+        }
+    });
+    
+    // Purchase distribution chart
+    const ctx2 = document.getElementById('purchaseChart').getContext('2d');
+    const purchaseChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Group A: Purchased', 'Group A: Did Not Purchase', 'Group B: Purchased', 'Group B: Did Not Purchase'],
+            datasets: [{
+                data: [
+                    abTestData.contingency_table.group_a.yes,
+                    abTestData.contingency_table.group_a.no,
+                    abTestData.contingency_table.group_b.yes,
+                    abTestData.contingency_table.group_b.no
+                ],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.6)',
+                    'rgba(102, 126, 234, 0.3)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 99, 132, 0.3)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+</script>
+{% endblock %}
+

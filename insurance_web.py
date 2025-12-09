@@ -10,7 +10,7 @@ from typing import Dict, Any, List
 
 def load_insurance_data() -> Dict[str, Any]:
     """Load insurance data from CSV and return structured data for web display"""
-    csv_path = os.path.join(os.path.dirname(__file__), 'insurance_analysis', 'insurance.csv')
+    csv_path = os.path.join(os.path.dirname(__file__), 'csv', 'insurance.csv')
     
     ages = []
     sexes = []

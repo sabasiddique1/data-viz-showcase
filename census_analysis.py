@@ -13,7 +13,7 @@ def load_census_data():
     """Load census data from CSV files"""
     try:
         # Try to find states*.csv files
-        state_files = glob.glob(os.path.join('data', 'states*.csv'))
+        state_files = glob.glob(os.path.join('csv', 'states*.csv'))
         if not state_files:
             state_files = glob.glob('states*.csv')
         

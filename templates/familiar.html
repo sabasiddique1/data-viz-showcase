@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Familiar Data Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-dna"></i> Familiar Data Analysis</h1>
+    <p>Analyze lifespan and iron levels across different packs</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
+        <h3>Vein Pack Lifespan</h3>
+        <p class="stat-value">{{ "%.1f"|format(data.lifespan_stats.vein.mean) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
+        <h3>Artery Pack Lifespan</h3>
+        <p class="stat-value">{{ "%.1f"|format(data.lifespan_stats.artery.mean) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-vial"></i></div>
+        <h3>Total Samples</h3>
+        <p class="stat-value">{{ data.total_samples }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+        <h3>Significant Difference</h3>
+        <p class="stat-value">{{ "Yes" if data.lifespan_test.significant else "No" }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-bar"></i> Lifespan Comparison by Pack</h2>
+    <div class="chart-container">
+        <canvas id="lifespanChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart compares the average lifespan between vein and artery packs. It shows whether there is a statistically significant difference in lifespan between the two groups.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The t-test shows a p-value of <strong>{{ "%.4f"|format(data.lifespan_test.p_value) }}</strong>, which is {% if data.lifespan_test.significant %}<strong>statistically significant</strong> (p < 0.05){% else %}<strong>not statistically significant</strong> (p ≥ 0.05){% endif %}. This means {% if data.lifespan_test.significant %}there is a significant difference{% else %}there is no significant difference{% endif %} in lifespan between the two packs.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Statistical tests help determine if observed differences are meaningful or due to random variation. A p-value < 0.05 indicates statistical significance.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-pie"></i> Iron Level Distribution by Pack</h2>
+    <div class="chart-container">
+        <canvas id="ironChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart shows the distribution of iron levels (low, normal, high) across vein and artery packs. It helps identify if there are differences in iron levels between the two groups.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The chi-square test shows a p-value of <strong>{{ "%.4f"|format(data.iron_test.p_value) }}</strong>, which is {% if data.iron_test.significant %}<strong>statistically significant</strong>{% else %}<strong>not statistically significant</strong>{% endif %}. This indicates {% if data.iron_test.significant %}there is a significant association{% else %}there is no significant association{% endif %} between pack type and iron levels.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Chi-square tests are used to determine if there's an association between categorical variables. They help identify relationships in biological and medical data.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const lifespanData = {{ data.lifespan_stats|tojson }};
+    const ironData = {{ data.iron_distribution|tojson }};
+    
+    // Lifespan comparison chart
+    const ctx1 = document.getElementById('lifespanChart').getContext('2d');
+    const lifespanChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Vein Pack', 'Artery Pack'],
+            datasets: [{
+                label: 'Average Lifespan',
+                data: [lifespanData.vein.mean, lifespanData.artery.mean],
+                backgroundColor: ['rgba(102, 126, 234, 0.6)', 'rgba(255, 99, 132, 0.6)']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Lifespan' } }
+            }
+        }
+    });
+    
+    // Iron level distribution chart
+    const ctx2 = document.getElementById('ironChart').getContext('2d');
+    const ironChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Low', 'Normal', 'High'],
+            datasets: [{
+                label: 'Vein Pack',
+                data: [ironData.vein.low, ironData.vein.normal, ironData.vein.high],
+                backgroundColor: 'rgba(102, 126, 234, 0.6)'
+            }, {
+                label: 'Artery Pack',
+                data: [ironData.artery.low, ironData.artery.normal, ironData.artery.high],
+                backgroundColor: 'rgba(255, 99, 132, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Count' } }
+            }
+        }
+    });
+</script>
+{% endblock %}
+

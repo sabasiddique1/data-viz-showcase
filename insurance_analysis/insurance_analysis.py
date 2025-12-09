@@ -33,7 +33,9 @@ insurance_charges = []
 # Read data from insurance.csv
 def load_data():
     """Load insurance data from CSV file into lists."""
-    with open("insurance.csv") as insurance_file:
+    import os
+    csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'csv', 'insurance.csv')
+    with open(csv_path) as insurance_file:
         reader = csv.DictReader(insurance_file)
         for row in reader:
             ages.append(int(row["age"]))

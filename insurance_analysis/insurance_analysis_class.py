@@ -7,13 +7,16 @@ Great for portfolio projects and demonstrates OOP skills.
 """
 
 import csv
+import os
 
 
 class InsuranceDataset:
     """A class to store and analyze medical insurance data."""
     
-    def __init__(self, csv_file="insurance.csv"):
+    def __init__(self, csv_file=None):
         """Initialize the dataset and load data from CSV."""
+        if csv_file is None:
+            csv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'csv', 'insurance.csv')
         self.ages = []
         self.sexes = []
         self.bmis = []
@@ -224,7 +227,7 @@ class InsuranceDataset:
 # Main execution
 if __name__ == "__main__":
     # Create dataset instance
-    dataset = InsuranceDataset("insurance.csv")
+    dataset = InsuranceDataset()  # Uses default path to csv/insurance.csv
     
     # Run full analysis
     dataset.run_full_analysis()

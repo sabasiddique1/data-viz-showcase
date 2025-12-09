@@ -16,6 +16,12 @@ import mushroom_analysis
 import airline_analysis
 import life_expectancy_analysis
 import census_analysis
+import honey_production_analysis
+import feature_transformation_analysis
+import biodiversity_analysis
+import familiar_analysis
+import fetchmaker_analysis
+import ab_test_analysis
 
 app = Flask(__name__)
 
@@ -260,6 +266,90 @@ def api_life_expectancy():
 def api_census():
     """API endpoint for census data"""
     return jsonify(census_analysis.analyze_census())
+
+@app.route('/honey')
+def honey():
+    """Honey production analysis page"""
+    try:
+        results = honey_production_analysis.analyze_honey_production()
+        return render_template('honey.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/features')
+def features():
+    """Feature transformation analysis page"""
+    try:
+        results = feature_transformation_analysis.analyze_feature_transformation()
+        return render_template('features.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/biodiversity')
+def biodiversity():
+    """Biodiversity analysis page"""
+    try:
+        results = biodiversity_analysis.analyze_biodiversity()
+        return render_template('biodiversity.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/familiar')
+def familiar():
+    """Familiar data analysis page"""
+    try:
+        results = familiar_analysis.analyze_familiar()
+        return render_template('familiar.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/fetchmaker')
+def fetchmaker():
+    """Fetchmaker dog data analysis page"""
+    try:
+        results = fetchmaker_analysis.analyze_fetchmaker()
+        return render_template('fetchmaker.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/ab-test')
+def ab_test():
+    """A/B test analysis page"""
+    try:
+        results = ab_test_analysis.analyze_ab_test()
+        return render_template('ab_test.html', data=results)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/api/honey')
+def api_honey():
+    """API endpoint for honey production data"""
+    return jsonify(honey_production_analysis.analyze_honey_production())
+
+@app.route('/api/features')
+def api_features():
+    """API endpoint for feature transformation data"""
+    return jsonify(feature_transformation_analysis.analyze_feature_transformation())
+
+@app.route('/api/biodiversity')
+def api_biodiversity():
+    """API endpoint for biodiversity data"""
+    return jsonify(biodiversity_analysis.analyze_biodiversity())
+
+@app.route('/api/familiar')
+def api_familiar():
+    """API endpoint for familiar data"""
+    return jsonify(familiar_analysis.analyze_familiar())
+
+@app.route('/api/fetchmaker')
+def api_fetchmaker():
+    """API endpoint for fetchmaker data"""
+    return jsonify(fetchmaker_analysis.analyze_fetchmaker())
+
+@app.route('/api/ab-test')
+def api_ab_test():
+    """API endpoint for A/B test data"""
+    return jsonify(ab_test_analysis.analyze_ab_test())
 
 if __name__ == '__main__':
     import os

@@ -11,7 +11,7 @@ import os
 def load_airline_data():
     """Load airline data from CSV file"""
     try:
-        csv_path = os.path.join('data', 'flight.csv')
+        csv_path = os.path.join('csv', 'flight.csv')
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
             # Convert Yes/No strings to boolean for inflight features

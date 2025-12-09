@@ -11,7 +11,7 @@ import os
 def load_life_expectancy_data():
     """Load life expectancy and GDP data from CSV file"""
     try:
-        csv_path = os.path.join('data', 'all_data.csv')
+        csv_path = os.path.join('csv', 'all_data.csv')
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
         else:

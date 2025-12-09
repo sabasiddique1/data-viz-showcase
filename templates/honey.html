@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Honey Production Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-honey"></i> Honey Production Linear Regression</h1>
+    <p>Analyze honey production trends and predict future production using linear regression</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-sliders-h"></i></div>
+        <h3>Slope</h3>
+        <p class="stat-value">{{ "%.2f"|format(data.slope) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-arrows-alt-v"></i></div>
+        <h3>Intercept</h3>
+        <p class="stat-value">{{ "%.0f"|format(data.intercept) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        <h3>Current Average</h3>
+        <p class="stat-value">{{ "%.0f"|format(data.current_avg) }}</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-crystal-ball"></i></div>
+        <h3>2050 Prediction</h3>
+        <p class="stat-value">{{ "%.0f"|format(data.prediction_2050) }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-chart-line"></i> Historical Production with Regression Line</h2>
+    <div class="chart-container">
+        <canvas id="historicalChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart displays historical honey production data points along with the linear regression line that best fits the data. The regression line helps identify trends and predict future production.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> The regression line has a slope of <strong>{{ "%.2f"|format(data.slope) }}</strong>, indicating the average change in production per year. The intercept of <strong>{{ "%.0f"|format(data.intercept) }}</strong> represents the baseline production level.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Linear regression helps identify long-term trends in honey production. A positive slope suggests increasing production, while a negative slope indicates declining production over time.
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2><i class="fas fa-crystal-ball"></i> Future Production Prediction (2013-2050)</h2>
+    <div class="chart-container">
+        <canvas id="futureChart"></canvas>
+    </div>
+    <div class="chart-description">
+        <h4><i class="fas fa-info-circle"></i> What This Chart Shows</h4>
+        <p>This chart projects future honey production based on the linear regression model. It shows predicted production levels from 2013 to 2050.</p>
+        
+        <div class="insight-box">
+            <strong>Key Insight:</strong> Based on historical trends, honey production in 2050 is predicted to be <strong>{{ "%.0f"|format(data.prediction_2050) }}</strong> units. This projection assumes current trends continue.
+        </div>
+        
+        <div class="key-takeaway">
+            💡 <strong>Takeaway:</strong> Future predictions are based on historical data patterns. Real-world factors like climate change, bee health, and agricultural practices may affect actual production.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const historicalData = {{ data.historical_data|tojson }};
+    const futureData = {{ data.future_data|tojson }};
+    
+    // Historical chart
+    const ctx1 = document.getElementById('historicalChart').getContext('2d');
+    const historicalChart = new Chart(ctx1, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Actual Production',
+                data: historicalData.years.map((year, i) => ({x: year, y: historicalData.actual[i]})),
+                backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                pointRadius: 5
+            }, {
+                label: 'Regression Line',
+                data: historicalData.years.map((year, i) => ({x: year, y: historicalData.predicted[i]})),
+                type: 'line',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                fill: false,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: { title: { display: true, text: 'Year' } },
+                y: { title: { display: true, text: 'Total Production' } }
+            }
+        }
+    });
+    
+    // Future prediction chart
+    const ctx2 = document.getElementById('futureChart').getContext('2d');
+    const futureChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: futureData.years,
+            datasets: [{
+                label: 'Predicted Production',
+                data: futureData.predicted,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: { title: { display: true, text: 'Year' } },
+                y: { title: { display: true, text: 'Predicted Production' } }
+            }
+        }
+    });
+</script>
+{% endblock %}
+
